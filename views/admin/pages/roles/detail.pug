@@ -1,0 +1,15 @@
+extends ../../layouts/default.pug
+
+block main 
+    if (role.title)
+        div(class="mb-4") Nhóm quyền: <b>#{role.title}</b>
+
+    if (role.description)
+        div(class="mb-4") Mô tả quyền: <b>#{role.description}</b>
+    
+    a(
+        href=`${prefixAdmin}/roles/edit/${role.id}`
+        class="btn btn-warning"       
+    ) Chỉnh sửa
+
+    script(src="/admin/js/product.js") 
