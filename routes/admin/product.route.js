@@ -1,6 +1,5 @@
 const express = require("express");
 const multer = require('multer');
-
 const router = express.Router();
 // const storageMulter = require("../../helpers/storageMulter")
 const upload = multer();

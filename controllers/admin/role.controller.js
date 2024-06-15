@@ -16,7 +16,7 @@ module.exports.index = async (req, res) => {
     });
 };
 
-// [GET] / admin / roles
+// [GET] / admin / roles / create
 module.exports.create = async (req, res) => {
     res.render("admin/pages/roles/create", {
         pageTitle: "Tạo nhóm quyền",
