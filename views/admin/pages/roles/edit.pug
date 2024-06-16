@@ -2,42 +2,43 @@ extend ../../layouts/default.pug
 include ../../mixins/alert.pug
 
 block main 
-    h1(class="mb-4") Chỉnh sửa nhóm quyền
+    if(role.permissions.includes("roles_edit"))
+        h1(class="mb-4") Chỉnh sửa nhóm quyền
 
-    +alert-success(5000)
-    +alert-error(5000)
+        +alert-success(5000)
+        +alert-error(5000)
 
-    if(data)
-        form(
-            action=`${prefixAdmin}/roles/edit/${data.id}?_method=PATCH`
-            method="POST"
-        ) 
-            div(class="form-group")
-                label(for="title") Tiêu đề
-                input(
-                    type="text"
-                    class="form-control"
-                    id="title"
-                    name="title"
-                    required 
-                    value=data.title
-                )
-            div(class="form-group")
-                label(for="desc") Mô tả
-                input(
-                    type="text"
-                    class="form-control"
-                    id="desc"
-                    name="description"
-                    value=data.description
-                )       
-            div(class="form-group")
-                button(
-                    type="submit"
-                    class="btn btn-primary"
-                ) Cập nhật
-    else 
-        p Vui lòng tạo nhóm quyền trước khi cập nhật tài khoản
-        p
-            a(href=`${prefixAdmin}/roles/create` class="btn btn-secondary") Tạo nhóm quyền
+        if(data)
+            form(
+                action=`${prefixAdmin}/roles/edit/${data.id}?_method=PATCH`
+                method="POST"
+            ) 
+                div(class="form-group")
+                    label(for="title") Tiêu đề
+                    input(
+                        type="text"
+                        class="form-control"
+                        id="title"
+                        name="title"
+                        required 
+                        value=data.title
+                    )
+                div(class="form-group")
+                    label(for="desc") Mô tả
+                    input(
+                        type="text"
+                        class="form-control"
+                        id="desc"
+                        name="description"
+                        value=data.description
+                    )       
+                div(class="form-group")
+                    button(
+                        type="submit"
+                        class="btn btn-primary"
+                    ) Cập nhật
+        else 
+            p Vui lòng tạo nhóm quyền trước khi cập nhật tài khoản
+            p
+                a(href=`${prefixAdmin}/roles/create` class="btn btn-secondary") Tạo nhóm quyền
 

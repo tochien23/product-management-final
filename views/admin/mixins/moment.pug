@@ -1,0 +1,5 @@
+mixin formatDateTime(time)
+    span #{moment(time).format("DD/MM/YYYY HH:mm:ss")}
+
+mixin formatDateTimeAgo(time)
+    span #{moment(time,"YYYYMMDD").fromNow()}
