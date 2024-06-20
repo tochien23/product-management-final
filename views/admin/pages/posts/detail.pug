@@ -1,0 +1,34 @@
+extends ../../layouts/default.pug
+
+block main 
+    if (post.title)
+        h1(class="mb-4") #{post.title}
+
+    if (post.thumbnail)
+        div(class="mb-4") 
+            img(
+                src=post.thumbnail
+                style="width= 100px"
+            )
+
+    if (post.description)
+        div(class="mb-4") !{post.description}
+
+    if (post.status)
+        div(class="mb-4") 
+            span Trạng thái: 
+            if (post.status === "active")
+                span(class="badge badge-success") Hoạt động
+            else 
+                span(class="badge badge-danger") Dừng hoạt động
+
+    if (post.position)
+        div(class="mb-4") Vị trí: <b>#{post.position}</b>
+
+
+    a(
+        href=`${prefixAdmin}/posts/edit/${post.id}`
+        class="btn btn-warning"       
+    ) Chỉnh sửa
+
+    script(src="/admin/js/product.js") 

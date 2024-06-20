@@ -6,10 +6,10 @@ block main
     if(role.permissions.includes("products_create"))
         +alert-error(5000)
 
-        h1(class="mb-4") Thêm mới sản phẩm 
+        h1(class="mb-4") Thêm mới bài viết
 
         form(
-            action=`${prefixAdmin}/products/create`
+            action=`${prefixAdmin}/posts/create`
             id="form-create-product"
             method="POST"
             enctype="multipart/form-data"
@@ -24,77 +24,20 @@ block main
                     required 
                 )
             div(class="form-group")
-                label(for="product_category_id") Danh mục
+                label(for="post_category_id") Danh mục
                 select(
-                    name="product_category_id"
-                    id="product_category_id"
+                    name="post_category_id"
+                    id="post_category_id"
                     class="form-control"
                 )
                     option(value="") -- Chọn danh mục -- 
                     if(category)
                         +select-tree(category)
-            div(class="form-group form-check form-check-inline")
-                input(
-                    type="radio"
-                    class="form-check-input"
-                    id="featured1"
-                    name="featured"
-                    value="1"
-                )
-                label(for="featured1" class="form-check-label") Nổi bật
-            div(class="form-group form-check form-check-inline")
-                input(
-                    type="radio"
-                    class="form-check-input"
-                    id="featured0"
-                    name="featured"
-                    value="0"
-                    checked
-                )
-                label(for="featured0" class="form-check-label") Không
-            div(class="form-group")
-                label(for="desc") Mô tả
-                textarea(
-                    class="form-control textarea-mce"
-                    id="desc"
-                    name="description"
-                    rows="5"
-                )
-            div(class="form-group")
-                label(for="price") Giá
-                input(
-                    type="number"
-                    class="form-control"
-                    id="price"
-                    name="price"
-                    value="0"
-                    min="0"
-                )
-            div(class="form-group")
-                label(for="discount") % Giảm giá
-                input(
-                    type="number"
-                    class="form-control"
-                    id="discount"
-                    name="discountPercentage"
-                    value="0"
-                    min="0"
-                )
-            div(class="form-group")
-                label(for="stock") Số lượng
-                input(
-                    type="number"
-                    class="form-control"
-                    id="stock"
-                    name="stock"
-                    value="0"
-                    min="0"
-                )
             div(
                 class="form-group"
                 upload-image
             )
-                label(for="thumbnail") Ảnh
+                label(for="thumbnail") Ảnh minh họa
                 input(
                     type="file"
                     class="form-control-file"
@@ -107,6 +50,14 @@ block main
                     src=""
                     upload-image-preview
                     class="image-preview"
+                )
+            div(class="form-group")
+                label(for="desc") Nội dung
+                textarea(
+                    class="form-control textarea-mce"
+                    id="desc"
+                    name="description"
+                    rows="5"
                 )
             div(class="form-group")
                 label(for="position") Vị trí

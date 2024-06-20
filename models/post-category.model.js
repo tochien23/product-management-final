@@ -1,11 +1,21 @@
 const mongoose = require("mongoose");
+const slug = require('mongoose-slug-updater');
 
-const roleSchema = new mongoose.Schema({
+mongoose.plugin(slug);
+
+const postCategorySchema = new mongoose.Schema({
     title: String,
+    parent_id: {
+        type: String,
+        default: "",
+    },
     description: String,
-    permissions: {
-        type: Array,
-        default: []
+    status: String,
+    position: Number,
+    slug: {
+        type: String,
+        slug: 'title',
+        unique: true
     },
     createdBy: {
         account_id: String,
@@ -33,6 +43,6 @@ const roleSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Role = mongoose.model("Role", roleSchema, "roles");
+const PostCategory = mongoose.model('PostCategory', postCategorySchema, "posts-category");
 
-module.exports = Role;
+module.exports = PostCategory;

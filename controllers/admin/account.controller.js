@@ -27,6 +27,20 @@ module.exports.index = async (req, res) => {
     });
 };
 
+// [DELETE] / admin / accounts / delete / :id
+module.exports.deleteItem = async (req, res) => {
+    const id = req.params.id;
+    // Xóa vĩnh viễn
+    // await Product.deleteOne({ _id: id });
+    // Xóa mềm 
+    await Account.updateOne({ _id: id }, {
+        deleted: true,
+        deletedAt: new Date()
+    });
+    req.flash("success", `Đã xóa thành công tài khoản!`);
+    res.redirect("back");
+};
+
 // [GET] / admin / accounts / create
 module.exports.create = async (req, res) => {
     const roles = await Role.find({
@@ -108,4 +122,23 @@ module.exports.editPatch = async (req, res) => {
     }
 
     res.redirect("back");
+};
+
+// [GET] / admin / accounts / detail / :id
+module.exports.detail = async (req, res) => {
+    try {
+        const find = {
+            deleted: false,
+            _id: req.params.id
+        };
+
+        const account = await Account.findOne(find);
+
+        res.render("admin/pages/accounts/detail", {
+            pageTitle: account.title,
+            account: account
+        });
+    } catch (error) {
+        res.redirect(`${systemConfig.prefixAdmin}/accounts`);
+    }
 };

@@ -3,14 +3,15 @@ include ../../mixins/alert.pug
 include ../../mixins/select-tree.pug
 
 block main 
-    if(role.permissions.includes("products-category_edit"))
-        h1(class="mb-4") Chỉnh sửa danh mục sản phẩm 
-
+    if(role.permissions.includes("posts_edit"))
         +alert-error(5000)
         +alert-success(5000)
 
+        h1(class="mb-4") Chỉnh sửa sản phẩm 
+
         form(
-            action=`${prefixAdmin}/products-category/edit/${data.id}?_method=PATCH`
+            action=`${prefixAdmin}/posts/edit/${post.id}?_method=PATCH`
+            id="form-edit-product"
             method="POST"
             enctype="multipart/form-data"
         ) 
@@ -22,32 +23,23 @@ block main
                     id="title"
                     name="title"
                     required 
-                    value=data.title
+                    value=post.title
                 )
             div(class="form-group")
-                label(for="parent_id") Danh mục cha
+                label(for="post_category_id") Danh mục
                 select(
-                    name="parent_id"
-                    id="parent_id"
+                    name="post_category_id"
+                    id="post_category_id"
                     class="form-control"
                 )
-                    option(value="") -- Chọn danh mục cha -- 
-                    if(records)
-                        +select-tree(records, 1,data.parent_id)
-                            
-            div(class="form-group")
-                label(for="desc") Mô tả
-                textarea(
-                    class="form-control textarea-mce"
-                    id="desc"
-                    name="description"
-                    rows="5"
-                ) #{data.description}
+                    option(value="") -- Chọn danh mục -- 
+                    if(category)
+                        +select-tree(category, 1, post.post_category_id)
             div(
                 class="form-group"
                 upload-image
             )
-                label(for="thumbnail") Ảnh
+                label(for="thumbnail") Ảnh minh họa
                 input(
                     type="file"
                     class="form-control-file"
@@ -57,10 +49,18 @@ block main
                     upload-image-input
                 )
                 img(
-                    src=data.thumbnail
+                    src=post.thumbnail
                     upload-image-preview
                     class="image-preview"
                 )
+            div(class="form-group")
+                label(for="desc") Mô tả
+                textarea(
+                    class="form-control textarea-mce"
+                    id="desc"
+                    name="description"
+                    rows="5"
+                ) #{post.description}
             div(class="form-group")
                 label(for="position") Vị trí
                 input(
@@ -70,7 +70,7 @@ block main
                     name="position"
                     placeholder="Tự động tăng"
                     min="1"
-                    value=data.position
+                    value=post.position
                 )
             div(class="form-group form-check form-check-inline")
                 input(
@@ -79,7 +79,7 @@ block main
                     id="statusActive"
                     name="status"
                     value="active"
-                    checked=(data.status == "active" ? true : false)
+                    checked=(post.status == "active" ? true : false)
                 )
                 label(for="statusActive" class="form-check-label") Hoạt động
             div(class="form-group form-check form-check-inline")
@@ -89,7 +89,7 @@ block main
                     id="statusInActive"
                     name="status"
                     value="inactive"
-                    checked=(data.status == "inactive" ? true : false)
+                    checked=(post.status == "inactive" ? true : false)
                 )
                 label(for="statusInActive" class="form-check-label") Dừng hoạt động 
             div(class="form-group")
@@ -97,3 +97,5 @@ block main
                     type="submit"
                     class="btn btn-primary"
                 ) Cập nhật
+
+        script(src="/admin/js/product.js") 

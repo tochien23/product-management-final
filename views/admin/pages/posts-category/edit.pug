@@ -3,14 +3,14 @@ include ../../mixins/alert.pug
 include ../../mixins/select-tree.pug
 
 block main 
-    if(role.permissions.includes("products-category_edit"))
-        h1(class="mb-4") Chỉnh sửa danh mục sản phẩm 
+    if(role.permissions.includes("posts-category_edit"))
+        h1(class="mb-4") Chỉnh sửa danh mục bài viết 
 
         +alert-error(5000)
         +alert-success(5000)
 
         form(
-            action=`${prefixAdmin}/products-category/edit/${data.id}?_method=PATCH`
+            action=`${prefixAdmin}/posts-category/edit/${data.id}?_method=PATCH`
             method="POST"
             enctype="multipart/form-data"
         ) 
@@ -43,24 +43,6 @@ block main
                     name="description"
                     rows="5"
                 ) #{data.description}
-            div(
-                class="form-group"
-                upload-image
-            )
-                label(for="thumbnail") Ảnh
-                input(
-                    type="file"
-                    class="form-control-file"
-                    id="thumbnail"
-                    name="thumbnail"
-                    accept="image/*"
-                    upload-image-input
-                )
-                img(
-                    src=data.thumbnail
-                    upload-image-preview
-                    class="image-preview"
-                )
             div(class="form-group")
                 label(for="position") Vị trí
                 input(

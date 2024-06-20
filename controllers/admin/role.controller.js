@@ -1,4 +1,5 @@
 const Role = require("../../models/role.model");
+const Account = require("../../models/account.model");
 
 const systemConfig = require("../../config/system");
 
@@ -9,6 +10,28 @@ module.exports.index = async (req, res) => {
     };
 
     const records = await Role.find(find);
+
+    for (const product of records) {
+        // Lấy ra thông tin người tạo
+        const user = await Account.findOne({
+            _id: product.createdBy.account_id
+        });
+
+        if (user) {
+            product.accountFullName = user.fullName;
+        }
+
+        //Lấy ra người cạp nhật gần nhất
+        // const updatedBy = product.updatedBy[product.updatedBy.length - 1];
+        const updatedBy = product.updatedBy.slice(-1)[0];
+        if (updatedBy) {
+            const userUpdated = await Account.findOne({
+                _id: updatedBy.account_id
+            });
+
+            updatedBy.accountFullName = userUpdated.fullName
+        }
+    }
 
     res.render("admin/pages/roles/index", {
         pageTitle: "Nhóm quyền",
@@ -31,7 +54,10 @@ module.exports.deleteItem = async (req, res) => {
     // Xóa mềm 
     await Role.updateOne({ _id: id }, {
         deleted: true,
-        deletedAt: new Date()
+        deletedBy: {
+            account_id: res.locals.user.id,
+            deletedAt: new Date()
+        }
     });
     req.flash("success", `Đã xóa thành công quyền!`);
     res.redirect("back");
@@ -81,7 +107,15 @@ module.exports.editPatch = async (req, res) => {
     try {
         const id = req.params.id;
 
-        await Role.updateOne({ _id: id }, req.body);
+        const updatedBy = {
+            account_id: res.locals.user.id,
+            updatedAt: new Date()
+        }
+        
+        await Role.updateOne({ _id: id }, {
+            ...req.body,
+            $push: { updatedBy: updatedBy }
+        });
 
         req.flash("success", "Cập nhật nhóm quyền thành công!");
     } catch (error) {
