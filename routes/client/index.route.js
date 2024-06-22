@@ -1,4 +1,4 @@
-const categoryMiddleware = require("../../middlewares/client/categort.middleware");
+const categoryMiddleware = require("../../middlewares/client/category.middleware");
 
 const homeRoutes = require("./home.route");
 const productRoutes = require("./product.route");

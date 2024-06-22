@@ -1,6 +1,7 @@
 const Product = require("../../models/product.model");
 
 const productsHelper = require("../../helpers/products");
+
 // [GET]/
 module.exports.index = async (req, res) => {
     //Lấy ra sản phẩm nổi bật

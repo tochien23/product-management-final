@@ -1,0 +1,30 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+include ../../mixins/moment.pug
+
+block main 
+    .post-detail 
+        .container.my-5
+            .row
+                .col-6 
+                    .inner-thumb
+                        img(src=post.thumbnail, alt=post.title)
+                .col-6
+                    h1(class="inner-title") #{post.title}
+
+                    if (post.category)
+                        div(class="inner-category") 
+                            span Danh mục: 
+                            a(href=`/posts/${post.category.slug}`) #{post.category.title}
+                    div(class="inner-created")
+                        span Ngày tạo:
+                        span 
+                            +formatDateTimeAgo(post.createdBy.createdAt)
+
+        hr
+
+        .container.my-5
+            .row 
+                .col-12 
+                    +box-head("Mô tả bài viết")
+                    .inner-desc !{post.description}
