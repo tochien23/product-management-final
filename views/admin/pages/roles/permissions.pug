@@ -183,6 +183,30 @@ block main
                         each item in records
                             td(class="text-center")
                                 input(type="checkbox")
+                    //- Quản lý đơn hàng
+                    tr 
+                        td(colspan="4")
+                            b Quản lý đơn hàng 
+                    tr(data-name="orders_view")
+                        td Xem 
+                        each item in records
+                            td(class="text-center")
+                                input(type="checkbox")
+                    tr(data-name="orders_create")
+                        td Thêm mới 
+                        each item in records
+                            td(class="text-center")
+                                input(type="checkbox")
+                    tr(data-name="orders_edit")
+                        td Chỉnh sửa 
+                        each item in records
+                            td(class="text-center")
+                                input(type="checkbox")
+                    tr(data-name="orders_delete")
+                        td Xóa 
+                        each item in records
+                            td(class="text-center")
+                                input(type="checkbox")
 
         form(
             id="form-change-permissions"
