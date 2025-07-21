@@ -1,2 +1,268 @@
-footer.footer 
-   | #{settingGeneral.copyright}
+footer.footer.bg-dark.text-light.pt-5.pb-3.mt-auto
+    .container
+        // Main Footer Content
+        .row.g-4.mb-4
+            // Company Info - Wider column
+            .col-lg-4.col-md-6
+                .footer-section
+                    .footer-brand.mb-3
+                        .d-flex.align-items-center.mb-3
+                            .brand-icon.bg-primary.rounded.p-2.me-3
+                                i.fas.fa-store.fa-lg.text-white
+                            .brand-text
+                                h5.mb-0.fw-bold.text-white ShopChenHe
+                                .small.text-light.opacity-50 Chất lượng - Uy tín
+                    
+                    p.text-light.opacity-75.mb-3
+                        | Chúng tôi cam kết mang đến những sản phẩm chất lượng cao 
+                        | với giá cả hợp lý và dịch vụ khách hàng tốt nhất.
+                    
+                    // Social Media
+                    .social-links.d-flex.gap-2
+                        a.social-link.bg-primary.text-white.rounded.d-flex.align-items-center.justify-content-center(
+                            href="#"
+                            title="Facebook"
+                            style="width: 36px; height: 36px;"
+                        )
+                            i.fab.fa-facebook-f
+                        a.social-link.bg-info.text-white.rounded.d-flex.align-items-center.justify-content-center(
+                            href="#"
+                            title="Twitter"
+                            style="width: 36px; height: 36px;"
+                        )
+                            i.fab.fa-twitter
+                        a.social-link.bg-danger.text-white.rounded.d-flex.align-items-center.justify-content-center(
+                            href="#"
+                            title="Instagram"
+                            style="width: 36px; height: 36px;"
+                        )
+                            i.fab.fa-instagram
+                        a.social-link.bg-success.text-white.rounded.d-flex.align-items-center.justify-content-center(
+                            href="#"
+                            title="WhatsApp"
+                            style="width: 36px; height: 36px;"
+                        )
+                            i.fab.fa-whatsapp
+
+            // Quick Links
+            .col-lg-2.col-md-6.col-6
+                .footer-section
+                    h6.fw-bold.text-white.mb-3
+                        i.fas.fa-link.me-2.text-primary
+                        | Liên kết
+                    ul.list-unstyled.footer-links
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="/")
+                                | Trang chủ
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="/products")
+                                | Sản phẩm
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="/posts")
+                                | Blog
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="/cart")
+                                | Giỏ hàng
+
+            // Customer Service
+            .col-lg-3.col-md-6.col-6
+                .footer-section
+                    h6.fw-bold.text-white.mb-3
+                        i.fas.fa-headset.me-2.text-success
+                        | Hỗ trợ
+                    ul.list-unstyled.footer-links
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="#")
+                                | Hướng dẫn mua hàng
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="#")
+                                | Chính sách bảo mật
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="#")
+                                | Đổi trả & Hoàn tiền
+                        li.mb-2
+                            a.text-light.opacity-75.text-decoration-none(href="/user/info")
+                                | Tài khoản của tôi
+
+            // Contact & Newsletter
+            .col-lg-3.col-md-6
+                .footer-section
+                    h6.fw-bold.text-white.mb-3
+                        i.fas.fa-envelope.me-2.text-info
+                        | Liên hệ & Nhận tin
+                    
+                    // Contact Info - Compact
+                    .contact-info.mb-3
+                        .contact-item.mb-2.d-flex.align-items-center
+                            i.fas.fa-phone.me-2.text-success.flex-shrink-0
+                            a.text-light.text-decoration-none.small(href="tel:0375267340")
+                                | 037 526 7340
+                        
+                        .contact-item.mb-2.d-flex.align-items-center
+                            i.fas.fa-envelope.me-2.text-info.flex-shrink-0
+                            a.text-light.text-decoration-none.small(href="mailto:tochien123@gmail.com")
+                                | tochien123@gmail.com
+                        
+                        .contact-item.d-flex.align-items-start
+                            i.fas.fa-map-marker-alt.me-2.text-warning.flex-shrink-0.mt-1
+                            .text-light.small Liên Chiểu, Đà Nẵng
+                    
+                    // Newsletter
+                    .newsletter-form
+                        .small.text-light.opacity-75.mb-2 Đăng ký nhận tin khuyến mãi
+                        .input-group.mb-2
+                            input.form-control.form-control-sm.bg-dark.border-secondary.text-light(
+                                type="email"
+                                placeholder="Email của bạn"
+                                required
+                            )
+                            button.btn.btn-primary.btn-sm(type="submit")
+                                i.fas.fa-paper-plane
+                        
+                        .form-check
+                            input.form-check-input.bg-dark.border-secondary(
+                                type="checkbox"
+                                id="newsletterCheck"
+                                required
+                            )
+                            label.form-check-label.small.text-light.opacity-75(for="newsletterCheck")
+                                | Tôi đồng ý nhận email
+
+        // Footer Bottom
+        .border-top.border-secondary.pt-3
+            .row.align-items-center.g-3
+                .col-md-8.text-center.text-md-start
+                    .copyright.text-light.opacity-75
+                        if settingGeneral && settingGeneral.copyright
+                            | #{settingGeneral.copyright}
+                        else
+                            | © 2025 ShopChenHe. Tất cả quyền được bảo lưu.
+                
+                .col-md-4.text-center.text-md-end
+                    .payment-methods.d-flex.justify-content-center.justify-content-md-end.align-items-center.gap-2
+                        .payment-icons.d-flex.gap-1
+                            .payment-icon.bg-light.rounded.p-1(title="Visa")
+                                i.fab.fa-cc-visa.text-primary
+                            .payment-icon.bg-light.rounded.p-1(title="MasterCard")
+                                i.fab.fa-cc-mastercard.text-warning
+                            .payment-icon.bg-light.rounded.p-1(title="PayPal")
+                                i.fab.fa-cc-paypal.text-info
+                            .payment-icon.bg-light.rounded.p-1(title="MoMo")
+                                i.fas.fa-mobile-alt.text-danger
+
+    // Custom Styles
+    style.
+        .footer {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .footer-section h6 {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color) !important;
+            opacity: 1 !important;
+            transform: translateX(5px);
+        }
+        
+        .social-link {
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .newsletter-form .form-control {
+            transition: all 0.3s ease;
+        }
+        
+        .newsletter-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+            background-color: #2a2a2a !important;
+        }
+        
+        .newsletter-form .form-control::placeholder {
+            color: #8a8a8a;
+        }
+        
+        .payment-icon {
+            transition: all 0.3s ease;
+            width: 28px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .payment-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .contact-item a:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-section {
+                margin-bottom: 1.5rem;
+            }
+            
+            .footer-section h6 {
+                font-size: 1rem;
+                margin-bottom: 1rem !important;
+            }
+            
+            .social-links {
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+            
+            .contact-info {
+                text-align: center;
+            }
+            
+            .contact-item {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .brand-icon {
+                display: none;
+            }
+            
+            .footer-brand {
+                text-align: center;
+            }
+            
+            .payment-methods {
+                justify-content: center !important;
+            }
+            
+            .copyright {
+                font-size: 0.8rem;
+            }
+        }

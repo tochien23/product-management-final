@@ -1,42 +1,762 @@
 extends ../../layouts/default.pug
+include ../../mixins/alert.pug
 
-block main 
-    if (product.title)
-        h1(class="mb-4") #{product.title}
+block main
+    +alert-success(5000)
 
-    if (product.price)
-        div(class="mb-4") Giá: <b>#{product.price}$</b>
+    .product-detail-container
+        // Header Section
+        .page-header
+            .header-content
+                .header-info
+                    .breadcrumb-nav.mb-2
+                        a.breadcrumb-link(href=`${prefixAdmin}/products`)
+                            i.fas.fa-arrow-left.me-2
+                            span Quay lại danh sách
+                        .breadcrumb-separator /
+                        span.breadcrumb-current Chi tiết sản phẩm
+                    
+                    .page-title-group
+                        h1.page-title
+                            i.fas.fa-box.me-3
+                            span #{product.title || 'Không có tên'}
+                        if(product.product_category_id && product.category)
+                            .category-badge.mt-2
+                                i.fas.fa-folder.me-1
+                                span Danh mục: #{product.category.title}
 
-    if (product.discountPercentage)
-        div(class="mb-4") Giảm giá: <b>#{product.discountPercentage}%</b>
+                .header-actions
+                    a.btn-primary(href=`${prefixAdmin}/products/edit/${product.id}`)
+                        i.fas.fa-edit.me-2
+                        span Chỉnh sửa
+                    if(product.status == "active")
+                        a.btn-success(href="#" target="_blank")
+                            i.fas.fa-external-link-alt.me-2
+                            span Xem trực tiếp
 
-    if (product.stock)
-        div(class="mb-4") Còn lại: <b>#{product.stock}$</b>
+        // Main Content
+        .detail-content
+            .content-grid
+                // Left Column - Image & Meta Information
+                .detail-sidebar
+                    // Image Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-image.me-2
+                                span Hình ảnh sản phẩm
+                        
+                        .card-content
+                            .image-container
+                                if (product.thumbnail)
+                                    .product-thumbnail
+                                        img.thumbnail-image(
+                                            src=product.thumbnail
+                                            alt=product.title
+                                            onerror="this.src='/images/150x150.svg'"
+                                        )
+                                        .image-overlay
+                                            .overlay-content
+                                                i.fas.fa-search-plus
+                                                span Xem lớn
+                                else
+                                    .no-image-placeholder
+                                        i.fas.fa-image.placeholder-icon
+                                        .placeholder-text Chưa có hình ảnh
+                                        .placeholder-subtext Sản phẩm chưa được thêm ảnh
 
-    if (product.thumbnail)
-        div(class="mb-4") 
-            img(
-                src=product.thumbnail
-                style="width= 100px"
-            )
+                    // Meta Information Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin chi tiết
+                        
+                        .card-content
+                            .meta-grid
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-fingerprint.me-2
+                                        span ID sản phẩm
+                                    .meta-value.text-primary #{product.id}
 
-    if (product.status)
-        div(class="mb-4") 
-            span Trạng thái: 
-            if (product.status === "active")
-                span(class="badge badge-success") Hoạt động
-            else 
-                span(class="badge badge-danger") Dừng hoạt động
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-toggle-on.me-2
+                                        span Trạng thái
+                                    .meta-value
+                                        if(product.status == "active")
+                                            .status-badge.status-active
+                                                i.fas.fa-check-circle.me-1
+                                                span Đang bán
+                                        else
+                                            .status-badge.status-inactive
+                                                i.fas.fa-pause-circle.me-1
+                                                span Tạm dừng
 
-    if (product.position)
-        div(class="mb-4") Vị trí: <b>#{product.position}</b>
+                                if (product.position)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-sort-numeric-down.me-2
+                                            span Vị trí hiển thị
+                                        .meta-value #{product.position}
 
-    if (product.description)
-        div(class="mb-4") !{product.description}
+                                if(product.createdAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-plus.me-2
+                                            span Ngày tạo
+                                        .meta-value #{new Date(product.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
 
-    a(
-        href=`${prefixAdmin}/products/edit/${product.id}`
-        class="btn btn-warning"       
-    ) Chỉnh sửa
+                                if(product.updatedAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-edit.me-2
+                                            span Cập nhật lần cuối
+                                        .meta-value #{new Date(product.updatedAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                // Right Column - Product Information
+                .detail-main
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-dollar-sign.me-2
+                                span Thông tin giá & kho hàng
+                        
+                        .card-content
+                            .pricing-area
+                                .pricing-grid
+                                    .pricing-item
+                                        .pricing-label
+                                            i.fas.fa-tag.me-2
+                                            span Giá bán
+                                        .pricing-value.price-value
+                                            if(product.price)
+                                                span.currency $
+                                                span.amount #{product.price}
+                                            else
+                                                .no-content-placeholder Chưa cập nhật
+                                    
+                                    .pricing-item
+                                        .pricing-label
+                                            i.fas.fa-percentage.me-2
+                                            span Giảm giá
+                                        .pricing-value.discount-value
+                                            if(product.discountPercentage)
+                                                span.discount-badge #{product.discountPercentage}%
+                                            else
+                                                .no-content-placeholder Không có
+                                    
+                                    .pricing-item
+                                        .pricing-label
+                                            i.fas.fa-boxes.me-2
+                                            span Tồn kho
+                                        .pricing-value.stock-value
+                                            if(product.stock)
+                                                span.stock-amount #{product.stock}
+                                                span.stock-unit sản phẩm
+                                            else
+                                                .no-content-placeholder Chưa cập nhật
+                                    
+                                    if(product.featured !== undefined)
+                                        .pricing-item
+                                            .pricing-label
+                                                i.fas.fa-star.me-2
+                                                span Sản phẩm nổi bật
+                                            .pricing-value.featured-value
+                                                if(product.featured == "1")
+                                                    .featured-badge.yes
+                                                        i.fas.fa-star.me-1
+                                                        span Có
+                                                else
+                                                    .featured-badge.no
+                                                        i.fas.fa-star-o.me-1
+                                                        span Không
+
+            // Description Section
+            if(product.description)
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-align-left.me-2
+                            span Mô tả sản phẩm
+                    
+                    .card-content
+                        .description-content
+                            .product-description !{product.description}
+
+            // Action Section
+            .action-section
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-cogs.me-2
+                            span Thao tác quản lý
+                    
+                    .card-content
+                        .action-buttons
+                            a.btn-primary(href=`${prefixAdmin}/products/edit/${product.id}`)
+                                i.fas.fa-edit.me-2
+                                span Chỉnh sửa sản phẩm
+                            
+                            a.btn-secondary(href=`${prefixAdmin}/products`)
+                                i.fas.fa-list.me-2
+                                span Danh sách sản phẩm
+                            
+                            if(product.product_category_id)
+                                a.btn-info(href=`${prefixAdmin}/products-category/detail/${product.product_category_id}`)
+                                    i.fas.fa-folder.me-2
+                                    span Xem danh mục
+                            
+                            if(product.status == "active")
+                                a.btn-success(href="#" target="_blank")
+                                    i.fas.fa-external-link-alt.me-2
+                                    span Xem trực tiếp
+                            
+                            if(role.permissions && role.permissions.includes("products_delete"))
+                                button.btn-danger(
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                )
+                                    i.fas.fa-trash-alt.me-2
+                                    span Xóa sản phẩm
+
+    // Delete Confirmation Modal
+    if(role.permissions && role.permissions.includes("products_delete"))
+        .modal.fade#deleteModal(tabindex="-1")
+            .modal-dialog.modal-dialog-centered
+                .modal-content
+                    .modal-header.border-0
+                        h5.modal-title.text-danger
+                            i.fas.fa-exclamation-triangle.me-2
+                            | Xác nhận xóa sản phẩm
+                        button.btn-close(type="button" data-bs-dismiss="modal")
+                    .modal-body.text-center.py-4
+                        .delete-icon.mb-3
+                            i.fas.fa-trash-alt.fa-3x.text-danger.opacity-50
+                        p.mb-3.h6 Bạn có chắc chắn muốn xóa sản phẩm này?
+                        .alert.alert-warning.text-start
+                            strong #{product.title}
+                        p.text-muted.small Hành động này không thể hoàn tác
+                    .modal-footer.border-0.justify-content-center
+                        button.btn.btn-secondary.px-4(type="button" data-bs-dismiss="modal") Hủy bỏ
+                        a.btn.btn-danger.px-4(href=`${prefixAdmin}/products/delete/${product.id}`) Xóa sản phẩm
+
+    style.
+        .product-detail-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: #6c757d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: #f39c12;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #adb5bd;
+        }
+
+        .breadcrumb-current {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .page-title i {
+            color: #f39c12;
+            font-size: 28px;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-danger {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .detail-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #f39c12;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .product-thumbnail {
+            position: relative;
+            display: inline-block;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-thumbnail:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .product-thumbnail:hover .thumbnail-image {
+            transform: scale(1.05);
+        }
+
+        .overlay-content {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .overlay-content i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-image-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .pricing-area {
+            line-height: 1.8;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .pricing-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+            text-align: center;
+        }
+
+        .pricing-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .pricing-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .price-value .currency {
+            color: #f39c12;
+            font-size: 14px;
+        }
+
+        .price-value .amount {
+            color: #27ae60;
+            font-size: 20px;
+        }
+
+        .discount-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stock-amount {
+            color: #3498db;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .stock-unit {
+            color: #6c757d;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .featured-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .featured-badge.yes {
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
+            color: white;
+        }
+
+        .featured-badge.no {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .no-content-placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .description-content {
+            line-height: 1.8;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .product-description h1, .product-description h2, .product-description h3,
+        .product-description h4, .product-description h5, .product-description h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .product-description p {
+            margin-bottom: 1.5rem;
+        }
+
+        .product-description img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-description blockquote {
+            border-left: 4px solid #f39c12;
+            padding-left: 20px;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .action-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .delete-icon {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-sidebar {
+                order: 2;
+            }
+
+            .detail-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-detail-container {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-actions {
+                align-self: stretch;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn-primary,
+            .header-actions .btn-success {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn-primary,
+            .action-buttons .btn-secondary,
+            .action-buttons .btn-info,
+            .action-buttons .btn-success,
+            .action-buttons .btn-danger {
+                justify-content: center;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
     script(src="/admin/js/product.js") 

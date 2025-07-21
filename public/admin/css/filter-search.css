@@ -1,0 +1,464 @@
+/* ==================== ENHANCED FILTER & SEARCH SECTION STYLES ==================== */
+
+/* Modern Filter and Search Section Styles */
+.filters-search-section .card {
+    border: none !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease;
+}
+
+.filters-search-section .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+.bg-gradient-light {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+}
+
+/* Modern Search Wrapper */
+.search-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.search-wrapper .form-control {
+    border-radius: 0.75rem !important;
+    border: 2px solid #e2e8f0 !important;
+    padding: 0.875rem 4rem 0.875rem 1.25rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+.search-wrapper .form-control:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.1), 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-1px);
+    background: white !important;
+}
+
+.search-wrapper .form-control::placeholder {
+    color: #94a3b8 !important;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.search-actions button {
+    transition: all 0.3s ease !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(8px);
+}
+
+.search-actions button:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.search-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--admin-primary), #81D4FA) !important;
+}
+
+/* Enhanced Stats Card */
+.stats-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 195, 74, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.stats-card:hover::before {
+    left: 100%;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+    border-color: var(--admin-primary);
+}
+
+.stats-card .fs-4 {
+    font-size: 2.2rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, var(--admin-primary), #81D4FA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Quick Filters Section */
+.quick-filters-section {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-radius: 0.75rem !important;
+    padding: 1.25rem !important;
+    border: 1px solid rgba(226, 232, 240, 0.6) !important;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-filters-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(139, 195, 74, 0.05), transparent);
+    animation: rotate 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.filter-pills {
+    gap: 0.75rem !important;
+    position: relative;
+    z-index: 1;
+}
+
+.filter-chip {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-width: 2px !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.25rem !important;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.filter-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: left 0.5s ease;
+}
+
+.filter-chip:hover::before {
+    left: 100%;
+}
+
+.filter-chip:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.filter-chip.active {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+    border-width: 2px !important;
+}
+
+.filter-chip[data-filter="active"] {
+    border-color: #22c55e !important;
+    color: #22c55e !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.filter-chip[data-filter="active"]:hover,
+.filter-chip[data-filter="active"].active {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    color: white !important;
+    border-color: #22c55e !important;
+}
+
+.filter-chip[data-filter="inactive"] {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.filter-chip[data-filter="inactive"]:hover,
+.filter-chip[data-filter="inactive"].active {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+}
+
+.filter-chip[data-filter="new"] {
+    border-color: #81D4FA !important;
+    color: #81D4FA !important;
+    background: rgba(129, 212, 250, 0.1) !important;
+}
+
+.filter-chip[data-filter="new"]:hover,
+.filter-chip[data-filter="new"].active {
+    background: linear-gradient(135deg, #81D4FA, #8BC34A) !important;
+    color: white !important;
+    border-color: #81D4FA !important;
+}
+
+.filter-chip[data-filter="featured"] {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+    background: rgba(245, 158, 11, 0.1) !important;
+}
+
+.filter-chip[data-filter="featured"]:hover,
+.filter-chip[data-filter="featured"].active {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border-color: #f59e0b !important;
+}
+
+/* Enhanced Active Filters */
+.active-filters .alert {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%) !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 0.75rem !important;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(129, 212, 250, 0.15) !important;
+}
+
+.active-filter-tags .badge {
+    background: linear-gradient(135deg, var(--admin-primary), #81D4FA) !important;
+    padding: 0.5rem 0.875rem !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(139, 195, 74, 0.3) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.active-filter-tags .badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.active-filter-tags .badge:hover::before {
+    left: 100%;
+}
+
+.active-filter-tags .badge:hover {
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.4) !important;
+}
+
+.active-filter-tags .btn-close {
+    font-size: 0.6rem !important;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.active-filter-tags .btn-close:hover {
+    opacity: 1;
+    transform: scale(1.2) rotate(90deg);
+}
+
+/* Enhanced Form Controls */
+.filters-search-section .form-select {
+    border-radius: 0.625rem !important;
+    border: 2px solid #d1d5db !important;
+    padding: 0.75rem 1rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+    font-weight: 500;
+}
+
+.filters-search-section .form-select:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.1), 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-1px);
+    background: white !important;
+}
+
+.filters-search-section .form-label {
+    font-weight: 700 !important;
+    margin-bottom: 0.625rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    color: #1f2937 !important;
+}
+
+.filters-search-section .form-label i {
+    font-size: 1rem !important;
+    padding: 0.25rem !important;
+    border-radius: 0.375rem !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Action Buttons */
+.filters-search-section .btn {
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.625rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-width: 2px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.filters-search-section .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.filters-search-section .btn:hover::before {
+    left: 100%;
+}
+
+.filters-search-section .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.filters-search-section .btn-primary {
+    background: linear-gradient(135deg, var(--admin-primary), #81D4FA) !important;
+    border-color: var(--admin-primary) !important;
+}
+
+.filters-search-section .btn-primary:hover {
+    background: linear-gradient(135deg, #7CB342, #8BC34A) !important;
+    box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4) !important;
+}
+
+/* Enhanced Badge */
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+    padding: 0.625rem 1rem !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge.bg-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.badge.bg-secondary:hover::before {
+    left: 100%;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 992px) {
+    .stats-card .fs-4 {
+        font-size: 1.8rem !important;
+    }
+    
+    .quick-filters-section {
+        padding: 1rem !important;
+    }
+    
+    .filter-chip {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .search-wrapper .form-control {
+        padding: 0.75rem 3.5rem 0.75rem 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-search-section .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .search-wrapper .form-control {
+        padding: 0.75rem 3.5rem 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .search-actions button {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    .stats-card {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .stats-card .fs-4 {
+        font-size: 1.5rem !important;
+    }
+    
+    .filter-pills {
+        justify-content: center;
+        gap: 0.5rem !important;
+    }
+    
+    .filter-chip {
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .quick-filters-section {
+        padding: 0.75rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-wrapper .form-control {
+        padding: 0.625rem 3rem 0.625rem 0.875rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .search-actions button {
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
+    .stats-card .fs-4 {
+        font-size: 1.25rem !important;
+    }
+    
+    .filter-chip {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .filters-search-section .btn {
+        padding: 0.625rem 1.25rem !important;
+        font-size: 0.875rem !important;
+    }
+} 

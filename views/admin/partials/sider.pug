@@ -1,30 +1,121 @@
-.sider 
-    .inner-menu     
-        ul 
-            li 
-                a(href=`${prefixAdmin}/dashboard`) Tổng quan 
-            if(role.permissions.includes("products-category_view"))
-                li 
-                    a(href=`${prefixAdmin}/products-category`) Danh mục sản phẩm
-            if(role.permissions.includes("products_view"))
-                li 
-                    a(href=`${prefixAdmin}/products`) Danh sách sản phẩm
-            if(role.permissions.includes("roles_view"))
-                li 
-                    a(href=`${prefixAdmin}/roles`) Nhóm quyền
-            if(role.permissions.includes("roles_permissions"))
-                li 
-                    a(href=`${prefixAdmin}/roles/permissions`) Phân quyền
-            if(role.permissions.includes("accounts_view"))
-                li 
-                    a(href=`${prefixAdmin}/accounts`) Danh sách tài khoản
-            //- if(role.permissions.includes("posts-category_view"))
-            li 
-                a(href=`${prefixAdmin}/posts-category`) Danh mục bài viết
-            //- if(role.permissions.includes("posts_view"))
-            li 
-                a(href=`${prefixAdmin}/posts`) Bài viết
-            li 
-                a(href=`${prefixAdmin}/info-order`) Đơn hàng
-            li 
-                a(href=`${prefixAdmin}/settings/general`) Cài đặt chung
+.admin-sidebar.bg-white.border-end.position-fixed.h-100
+    .sidebar-content.h-100.d-flex.flex-column
+        // Sidebar Header
+        .sidebar-header.p-4.border-bottom
+            .sidebar-user.text-center
+                .user-avatar.mx-auto.mb-3
+                    .avatar.bg-gradient-primary.rounded-circle.d-flex.align-items-center.justify-content-center.shadow-sm(style="width: 60px; height: 60px;")
+                        i.fas.fa-user.text-white.fs-4
+                .user-welcome
+                    .user-name.fw-bold.text-dark.mb-1 #{user.fullName}
+                    .user-status.small.text-muted
+                        i.fas.fa-circle.text-success.me-1(style="font-size: 0.5rem;")
+                        | Đang hoạt động
+
+        // Navigation Menu
+        .sidebar-nav.flex-grow-1.p-3
+            nav.admin-nav
+                // Dashboard
+                ul.nav.flex-column.mb-4
+                    li.nav-section.mb-2
+                        .nav-section-title.small.text-uppercase.text-muted.fw-bold.px-3.mb-2 Tổng quan
+                    li.nav-item.mb-1
+                        a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/dashboard`, class=currentPage === 'dashboard' ? 'active' : '', data-tooltip="Dashboard")
+                            .nav-icon.me-3
+                                i.fas.fa-tachometer-alt.fs-5
+                            .nav-text Dashboard
+                            .nav-badge.ms-auto
+                                .badge.bg-primary.rounded-pill 5
+
+                // Content Management
+                ul.nav.flex-column.mb-4
+                    li.nav-section.mb-2
+                        .nav-section-title.small.text-uppercase.text-muted.fw-bold.px-3.mb-2 Quản lý nội dung
+                    
+                    if(role.permissions.includes("products_view"))
+                        li.nav-item.mb-1
+                            a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/products`, class=currentPage === 'products' ? 'active' : '', data-tooltip="Sản phẩm")
+                                .nav-icon.me-3
+                                    i.fas.fa-box.fs-5.text-primary
+                                .nav-text Sản phẩm
+                                .nav-arrow.ms-auto
+                                    i.fas.fa-chevron-right.small
+
+                    if(role.permissions.includes("products-category_view"))
+                        li.nav-item.mb-1
+                            a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/products-category`, class=currentPage === 'products-category' ? 'active' : '', data-tooltip="Danh mục sản phẩm")
+                                .nav-icon.me-3
+                                    i.fas.fa-tags.fs-5.text-success
+                                .nav-text Danh mục SP
+
+                    li.nav-item.mb-1
+                        a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/posts`, class=currentPage === 'posts' ? 'active' : '', data-tooltip="Bài viết")
+                            .nav-icon.me-3
+                                i.fas.fa-newspaper.fs-5.text-info
+                            .nav-text Bài viết
+
+                    li.nav-item.mb-1
+                        a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/posts-category`, class=currentPage === 'posts-category' ? 'active' : '', data-tooltip="Danh mục bài viết")
+                            .nav-icon.me-3
+                                i.fas.fa-folder.fs-5.text-warning
+                            .nav-text Danh mục BV
+
+                // Orders & Customers
+                ul.nav.flex-column.mb-4
+                    li.nav-section.mb-2
+                        .nav-section-title.small.text-uppercase.text-muted.fw-bold.px-3.mb-2 Bán hàng
+                    li.nav-item.mb-1
+                        a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/info-order`, class=currentPage === 'orders' ? 'active' : '', data-tooltip="Đơn hàng")
+                            .nav-icon.me-3
+                                i.fas.fa-shopping-cart.fs-5.text-success
+                            .nav-text Đơn hàng
+                            .nav-badge.ms-auto
+                                .badge.bg-danger.rounded-pill 2
+
+                // User Management
+                if(role.permissions.includes("accounts_view") || role.permissions.includes("roles_view"))
+                    ul.nav.flex-column.mb-4
+                        li.nav-section.mb-2
+                            .nav-section-title.small.text-uppercase.text-muted.fw-bold.px-3.mb-2 Người dùng
+                        
+                        if(role.permissions.includes("accounts_view"))
+                            li.nav-item.mb-1
+                                a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/accounts`, class=currentPage === 'accounts' ? 'active' : '', data-tooltip="Tài khoản")
+                                    .nav-icon.me-3
+                                        i.fas.fa-users.fs-5.text-primary
+                                    .nav-text Tài khoản
+
+                        if(role.permissions.includes("roles_view"))
+                            li.nav-item.mb-1
+                                a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/roles`, class=currentPage === 'roles' ? 'active' : '', data-tooltip="Nhóm quyền")
+                                    .nav-icon.me-3
+                                        i.fas.fa-user-shield.fs-5.text-warning
+                                    .nav-text Nhóm quyền
+
+                        if(role.permissions.includes("roles_permissions"))
+                            li.nav-item.mb-1
+                                a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/roles/permissions`, class=currentPage === 'permissions' ? 'active' : '', data-tooltip="Phân quyền")
+                                    .nav-icon.me-3
+                                        i.fas.fa-key.fs-5.text-danger
+                                    .nav-text Phân quyền
+
+                // System Settings
+                ul.nav.flex-column
+                    li.nav-section.mb-2
+                        .nav-section-title.small.text-uppercase.text-muted.fw-bold.px-3.mb-2 Hệ thống
+                    li.nav-item.mb-1
+                        a.nav-link.rounded-3.px-3.py-2.d-flex.align-items-center(href=`${prefixAdmin}/settings/general`, class=currentPage === 'settings' ? 'active' : '', data-tooltip="Cài đặt chung")
+                            .nav-icon.me-3
+                                i.fas.fa-cog.fs-5.text-secondary
+                            .nav-text Cài đặt chung
+
+        // Sidebar Footer
+        .sidebar-footer.p-3.border-top.bg-light
+            .upgrade-card.bg-gradient-primary.text-white.rounded-3.p-3.text-center
+                .upgrade-icon.mb-2
+                    i.fas.fa-crown.fs-3.text-warning
+                .upgrade-title.fw-bold.small Pro Version
+                .upgrade-text.small.mb-3.opacity-75 Nâng cấp để sử dụng tính năng nâng cao
+                a.btn.btn-warning.btn-sm.fw-bold(href="#") Nâng cấp ngay
+
+

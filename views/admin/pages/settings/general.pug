@@ -2,81 +2,196 @@ extend ../../layouts/default.pug
 include ../../mixins/alert.pug
 
 block main
-    h1 Cài đặt chung
-    
     +alert-error(5000)
 
-    form(
-        action=`${prefixAdmin}/settings/general?_method=PATCH`
-        method="POST"
-        enctype="multipart/form-data"
-    ) 
-        div(class="form-group")
-            label(for="websiteName") Tên website
-            input(
-                type="text"
-                class="form-control"
-                id="websiteName"
-                name="websiteName"
-                required 
-                value=(settingGeneral ? settingGeneral.websiteName : "")
-            )
-        div(
-            class="form-group"
-            upload-image
-        )
-            label(for="logo") Logo
-            input(
-                type="file"
-                class="form-control-file"
-                id="logo"
-                name="logo"
-                accept="image/*"
-                upload-image-input
-            )
-            img(
-                src=(settingGeneral ? settingGeneral.logo : "")
-                upload-image-preview
-                class="image-preview"
-            )
-        div(class="form-group")
-            label(for="phone") Số điện thoại
-            input(
-                type="text"
-                class="form-control"
-                id="phone"
-                name="phone"
-                value=(settingGeneral ? settingGeneral.phone : "")
-            )
-        div(class="form-group")
-            label(for="email") Email
-            input(
-                type="text"
-                class="form-control"
-                id="email"
-                name="email"
-                value=(settingGeneral ? settingGeneral.email : "")
-            )
-        div(class="form-group")
-            label(for="address") Địa chỉ
-            input(
-                type="text"
-                class="form-control"
-                id="address"
-                name="address"
-                value=(settingGeneral ? settingGeneral.address : "")
-            )
-        div(class="form-group")
-            label(for="copyright") Copyright
-            input(
-                type="text"
-                class="form-control"
-                id="copyright"
-                name="copyright"
-                value=(settingGeneral ? settingGeneral.copyright : "")
-            )
-        div(class="form-group")
-            button(
+    // Header
+    .d-flex.justify-content-between.align-items-center.mb-4
+        .header-info
+            h2.fw-bold.text-dark.mb-1 Cài đặt chung
+            p.text-muted.mb-0 Quản lý thông tin cơ bản của website
+        .header-actions
+            button.btn.btn-primary.px-4(
                 type="submit"
-                class="btn btn-primary"
-            ) Cập nhật
+                form="general-settings-form"
+            )
+                i.fas.fa-save.me-2
+                | Lưu cài đặt
+
+    // Settings Form
+    .bg-white.rounded-3.shadow-sm.overflow-hidden
+        .p-4
+            form#general-settings-form(
+                action=`${prefixAdmin}/settings/general?_method=PATCH`
+                method="POST"
+                enctype="multipart/form-data"
+            ) 
+                // Basic Information Section
+                .row.g-4
+                    .col-md-6
+                        .form-section
+                            .form-section-header.mb-3
+                                .d-flex.align-items-center
+                                    .section-icon.me-3
+                                        .bg-primary.bg-opacity-10.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 35px; height: 35px;")
+                                            i.fas.fa-globe.text-primary.small
+                                    .fw-semibold.text-dark Thông tin website
+                            
+                            .mb-3
+                                label.form-label.fw-semibold(for="websiteName")
+                                    i.fas.fa-tag.me-2.text-primary.small
+                                    | Tên website
+                                input.form-control(
+                                    type="text"
+                                    id="websiteName"
+                                    name="websiteName"
+                                    placeholder="Nhập tên website..."
+                                    required 
+                                    value=(settingGeneral ? settingGeneral.websiteName : "")
+                                )
+                    
+                    .col-md-6
+                        .form-section
+                            .form-section-header.mb-3
+                                .d-flex.align-items-center
+                                    .section-icon.me-3
+                                        .bg-info.bg-opacity-10.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 35px; height: 35px;")
+                                            i.fas.fa-image.text-info.small
+                                    .fw-semibold.text-dark Logo & Hình ảnh
+                            
+                            .mb-3(upload-image)
+                                label.form-label.fw-semibold(for="logo")
+                                    i.fas.fa-upload.me-2.text-info.small
+                                    | Logo website
+                                .logo-upload-container
+                                    input.form-control(
+                                        type="file"
+                                        id="logo"
+                                        name="logo"
+                                        accept="image/*"
+                                        upload-image-input
+                                    )
+                                    .logo-preview.mt-3
+                                        img.rounded.shadow-sm(
+                                            src=(settingGeneral ? settingGeneral.logo : "")
+                                            upload-image-preview
+                                            style="max-width: 150px; max-height: 80px; object-fit: contain; border: 2px solid #e9ecef;"
+                                            onerror="this.style.display='none'"
+                                        )
+                // Contact Information Section
+                .row.g-4.mt-2
+                    .col-12
+                        .form-section
+                            .form-section-header.mb-3
+                                .d-flex.align-items-center
+                                    .section-icon.me-3
+                                        .bg-success.bg-opacity-10.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 35px; height: 35px;")
+                                            i.fas.fa-address-book.text-success.small
+                                    .fw-semibold.text-dark Thông tin liên hệ
+                            
+                            .row.g-3
+                                .col-md-6
+                                    .mb-3
+                                        label.form-label.fw-semibold(for="phone")
+                                            i.fas.fa-phone.me-2.text-success.small
+                                            | Số điện thoại
+                                        input.form-control(
+                                            type="text"
+                                            id="phone"
+                                            name="phone"
+                                            placeholder="Nhập số điện thoại..."
+                                            value=(settingGeneral ? settingGeneral.phone : "")
+                                        )
+                                
+                                .col-md-6
+                                    .mb-3
+                                        label.form-label.fw-semibold(for="email")
+                                            i.fas.fa-envelope.me-2.text-success.small
+                                            | Email liên hệ
+                                        input.form-control(
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            placeholder="Nhập email liên hệ..."
+                                            value=(settingGeneral ? settingGeneral.email : "")
+                                        )
+                                
+                                .col-12
+                                    .mb-3
+                                        label.form-label.fw-semibold(for="address")
+                                            i.fas.fa-map-marker-alt.me-2.text-success.small
+                                            | Địa chỉ
+                                        input.form-control(
+                                            type="text"
+                                            id="address"
+                                            name="address"
+                                            placeholder="Nhập địa chỉ công ty..."
+                                            value=(settingGeneral ? settingGeneral.address : "")
+                                        )
+
+                // Copyright Section
+                .row.g-4.mt-2
+                    .col-12
+                        .form-section
+                            .form-section-header.mb-3
+                                .d-flex.align-items-center
+                                    .section-icon.me-3
+                                        .bg-warning.bg-opacity-10.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 35px; height: 35px;")
+                                            i.fas.fa-copyright.text-warning.small
+                                    .fw-semibold.text-dark Bản quyền
+                            
+                            .mb-3
+                                label.form-label.fw-semibold(for="copyright")
+                                    i.fas.fa-shield-alt.me-2.text-warning.small
+                                    | Thông tin bản quyền
+                                input.form-control(
+                                    type="text"
+                                    id="copyright"
+                                    name="copyright"
+                                    placeholder="© 2024 Tên công ty. All rights reserved."
+                                    value=(settingGeneral ? settingGeneral.copyright : "")
+                                )
+
+    // Custom Styling
+    style.
+        .form-section {
+            position: relative;
+        }
+        
+        .form-section-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 0.75rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .logo-upload-container .form-control {
+            border: 2px dashed #dee2e6;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-upload-container .form-control:hover {
+            border-color: var(--admin-primary);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+        
+        .logo-preview img {
+            transition: all 0.3s ease;
+        }
+        
+        .logo-preview img:hover {
+            transform: scale(1.05);
+        }
+        
+        .section-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .form-section:hover .section-icon {
+            transform: scale(1.1);
+        }
+
+    script(src="/admin/js/script.js")

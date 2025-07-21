@@ -3,10 +3,229 @@ include ../../mixins/box-head.pug
 include ../../mixins/product-layout.pug
 
 block main 
-    .container.my-3 
-        .row 
-            .col-12 
-               +box-head(pageTitle) 
+    // Page Header
+    section.page-header.bg-light.py-4.mb-4
+        .container
+            .row.align-items-center
+                .col-md-8
+                    h1.page-title.fw-bold.mb-2 #{pageTitle}
+                    nav(aria-label="breadcrumb")
+                        ol.breadcrumb.mb-0
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/") 
+                                    i.fas.fa-home.me-1
+                                    | Trang chủ
+                            li.breadcrumb-item.active(aria-current="page") #{pageTitle}
+                .col-md-4.text-md-end
+                    .d-flex.align-items-center.justify-content-md-end.gap-2
+                        span.text-muted Hiển thị #{products ? products.length : 0} sản phẩm
 
-        +product-grid(products)
+    // Main Products Section
+    section.products-main.py-4
+        .container
+            .row
+                // Enhanced Filters Sidebar
+                .col-lg-3.mb-4
+                    .filters-container
+                        .filters-card.bg-white.rounded-3.shadow-sm.overflow-hidden
+                            .filters-header.bg-primary.text-white.p-3
+                                h5.fw-bold.mb-0.d-flex.align-items-center
+                                    i.fas.fa-filter.me-2
+                                    | Bộ Lọc
+                            
+                            .filters-body.p-3
+                                // Search Filter
+                                .filter-group.mb-3
+                                    label.filter-label.fw-semibold.mb-2.d-flex.align-items-center
+                                        i.fas.fa-search.me-2.text-primary
+                                        | Tìm kiếm
+                                    .input-group
+                                        input.form-control.filter-search(type="text" placeholder="Tìm sản phẩm..." id="productSearch")
+                                        button.btn.btn-outline-primary(type="button" onclick="applyFilters()")
+                                            i.fas.fa-search
+                                
+                                // Price Range Filter
+                                .filter-group.mb-3
+                                    label.filter-label.fw-semibold.mb-2.d-flex.align-items-center
+                                        i.fas.fa-dollar-sign.me-2.text-success
+                                        | Khoảng Giá
+                                    .price-options
+                                        .form-check.mb-2
+                                            input.form-check-input(type="radio" name="priceRange" id="priceAll" value="" checked)
+                                            label.form-check-label(for="priceAll") Tất cả
+                                        .form-check.mb-2
+                                            input.form-check-input(type="radio" name="priceRange" id="price1" value="0-100")
+                                            label.form-check-label(for="price1") Dưới $100
+                                        .form-check.mb-2
+                                            input.form-check-input(type="radio" name="priceRange" id="price2" value="100-500")
+                                            label.form-check-label(for="price2") $100 - $500
+                                        .form-check.mb-2
+                                            input.form-check-input(type="radio" name="priceRange" id="price3" value="500-1000")
+                                            label.form-check-label(for="price3") $500 - $1000
+                                        .form-check.mb-2
+                                            input.form-check-input(type="radio" name="priceRange" id="price4" value="1000+")
+                                            label.form-check-label(for="price4") Trên $1000
+                                
+                                // Sort Options
+                                .filter-group.mb-3
+                                    label.filter-label.fw-semibold.mb-2.d-flex.align-items-center
+                                        i.fas.fa-sort.me-2.text-info
+                                        | Sắp Xếp
+                                    select.form-select(id="sortSelect" onchange="sortProducts(this.value)")
+                                        option(value="") Mặc định
+                                        option(value="price-asc") Giá: Thấp → Cao
+                                        option(value="price-desc") Giá: Cao → Thấp
+                                        option(value="name-asc") Tên: A → Z
+                                        option(value="name-desc") Tên: Z → A
+                                        option(value="newest") Mới nhất
+                                
+                                // Special Features
+                                .filter-group.mb-3
+                                    label.filter-label.fw-semibold.mb-2.d-flex.align-items-center
+                                        i.fas.fa-star.me-2.text-warning
+                                        | Tính Năng
+                                    .special-filters
+                                        .form-check.form-switch.mb-2
+                                            input.form-check-input(type="checkbox" id="featuredOnly")
+                                            label.form-check-label(for="featuredOnly") Sản phẩm nổi bật
+                                        .form-check.form-switch.mb-2
+                                            input.form-check-input(type="checkbox" id="discountOnly")
+                                            label.form-check-label(for="discountOnly") Đang giảm giá
+                                
+                                // Filter Actions
+                                .filter-actions.pt-3.border-top
+                                    button.btn.btn-outline-secondary.w-100.mb-2(type="button" onclick="resetFilters()")
+                                        i.fas.fa-undo.me-2
+                                        | Đặt lại
+                                    button.btn.btn-primary.w-100(type="button" onclick="applyFilters()")
+                                        i.fas.fa-check.me-2
+                                        | Áp dụng
+
+                // Products Grid
+                .col-lg-9
+                    .products-container
+                        // Products Header
+                        .products-header.bg-white.rounded-3.shadow-sm.p-3.mb-4
+                            .row.align-items-center
+                                .col-md-6
+                                    .results-info
+                                        h6.mb-1.fw-bold.text-primary.result-count Tìm thấy #{products ? products.length : 0} sản phẩm
+                                        p.mb-0.text-muted.small Hiển thị kết quả phù hợp nhất
+                                .col-md-6
+                                    .view-controls.d-flex.align-items-center.justify-content-md-end.gap-3
+                                        .view-toggle.btn-group(role="group")
+                                            input.btn-check(type="radio" name="viewType" id="gridView" autocomplete="off" checked)
+                                            label.btn.btn-outline-primary(for="gridView")
+                                                i.fas.fa-th.me-1
+                                                | Lưới
+                                            input.btn-check(type="radio" name="viewType" id="listView" autocomplete="off")
+                                            label.btn.btn-outline-primary(for="listView")
+                                                i.fas.fa-list.me-1
+                                                | Danh sách
+
+                        // Products Grid/List
+                        .products-content
+                            if products && products.length > 0
+                                .products-grid.grid-view#productsGrid
+                                    +enhanced-product-grid(products)
+                                
+                                // Pagination
+                                if products.length > 12
+                                    .pagination-container.mt-4
+                                        nav.d-flex.justify-content-center(aria-label="Product pagination")
+                                            ul.pagination.mb-0
+                                                li.page-item
+                                                    a.page-link(href="#")
+                                                        i.fas.fa-chevron-left.me-1
+                                                        | Trước
+                                                li.page-item.active
+                                                    a.page-link(href="#") 1
+                                                li.page-item
+                                                    a.page-link(href="#") 2
+                                                li.page-item
+                                                    a.page-link(href="#") 3
+                                                li.page-item
+                                                    a.page-link(href="#")
+                                                        | Sau
+                                                        i.fas.fa-chevron-right.ms-1
+                            else
+                                .empty-state.text-center.py-5.bg-white.rounded-3
+                                    .empty-illustration.mb-4
+                                        i.fas.fa-search.fa-4x.text-muted.opacity-50
+                                    h4.text-muted.mb-3 Không tìm thấy sản phẩm
+                                    p.text-muted.mb-4 Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc
+                                    .empty-actions
+                                        a.btn.btn-primary.btn-lg(href="/products")
+                                            i.fas.fa-grid-2.me-2
+                                            | Xem tất cả sản phẩm
+
+mixin enhanced-product-grid(products)
+    .row.g-4
+        each item in products 
+            .col-xl-4.col-lg-6.col-md-4.col-sm-6
+                +enhanced-product-item(item)
+
+mixin enhanced-product-item(item)
+    .product-card.h-100.bg-white.rounded-3.shadow-sm.overflow-hidden.transition-all.position-relative(
+        data-title=item.title.toLowerCase()
+        data-price=item.priceNew || item.price
+        data-featured=item.featured
+        data-discount=item.discountPercentage || 0
+    )
+        .product-badges.position-absolute.top-0.start-0.z-3.p-2
+            if(item.featured == "1")
+                .badge.bg-warning.text-dark.mb-1.shadow-sm
+                    i.fas.fa-fire.me-1
+                    | HOT
+            if(item.discountPercentage && item.discountPercentage > 0)
+                .badge.bg-danger.text-white.shadow-sm
+                    i.fas.fa-percentage.me-1
+                    | -#{item.discountPercentage}%
         
+        .product-image-container.position-relative.overflow-hidden
+            .product-image-wrapper.ratio.ratio-1x1
+                img.product-image.w-100.h-100.object-fit-cover.transition-transform(
+                    src=item.thumbnail
+                    alt=item.title
+                    loading="lazy"
+                )
+            
+            .product-overlay.position-absolute.w-100.h-100.d-flex.align-items-center.justify-content-center.bg-dark.bg-opacity-75.opacity-0.transition-all
+                .overlay-actions.text-center
+                    .d-flex.gap-2.mb-3
+                        a.btn.btn-light.btn-sm.rounded-circle.shadow(
+                            href=`/products/detail/${item.slug}`
+                            data-bs-toggle="tooltip"
+                            title="Xem chi tiết"
+                        )
+                            i.fas.fa-eye
+                        button.btn.btn-light.btn-sm.rounded-circle.shadow.wishlist-btn(
+                            data-id=item._id
+                            data-bs-toggle="tooltip"
+                            title="Yêu thích"
+                        )
+                            i.far.fa-heart
+                    button.btn.btn-warning.btn-lg.rounded-pill.shadow.add-to-cart(
+                        data-id=item._id
+                        type="button"
+                    )
+                        i.fas.fa-cart-plus.me-2
+                        | Thêm vào giỏ
+
+        .product-content.p-3
+            h5.product-title.fw-bold.mb-2.line-clamp-2
+                a.text-decoration-none.text-dark.stretched-link(href=`/products/detail/${item.slug}`) #{item.title}
+            
+            .product-rating.mb-2
+                .d-flex.align-items-center.justify-content-between
+                    .stars.text-warning
+                        - for(let i = 1; i <= 5; i++)
+                            i.fas.fa-star.small
+                    .rating-text.text-muted.small (4.8)
+            
+            .product-pricing.mt-auto
+                if(item.discountPercentage && item.discountPercentage > 0)
+                    .price-new.fw-bold.text-primary.fs-5.mb-1 $#{item.priceNew}
+                    .price-old.text-muted.text-decoration-line-through.small $#{item.price}
+                else
+                    .price-new.fw-bold.text-primary.fs-5 $#{item.price}

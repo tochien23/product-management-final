@@ -1,0 +1,53 @@
+mixin pagination(pagination, url = "")
+    if pagination && pagination.totalPage > 1
+        nav.d-flex.justify-content-center
+            ul.pagination.pagination-lg.shadow-sm
+                if pagination.currentPage > 1
+                    li.page-item
+                        a.page-link.rounded-start(href=`${url}?page=1`)
+                            i.fas.fa-angle-double-left.me-1
+                            | Đầu
+                    li.page-item
+                        a.page-link(href=`${url}?page=${pagination.currentPage - 1}`)
+                            i.fas.fa-angle-left.me-1
+                            | Trước
+
+                // Show page numbers with ellipsis for large page counts
+                - var startPage = Math.max(1, pagination.currentPage - 2)
+                - var endPage = Math.min(pagination.totalPage, pagination.currentPage + 2)
+                
+                if startPage > 1
+                    li.page-item
+                        a.page-link(href=`${url}?page=1`) 1
+                    if startPage > 2
+                        li.page-item.disabled
+                            span.page-link ...
+
+                - for (var i = startPage; i <= endPage; i++)
+                    li.page-item(class=pagination.currentPage == i ? "active" : "")
+                        if pagination.currentPage == i
+                            span.page-link.bg-primary.border-primary.text-white #{i}
+                        else
+                            a.page-link(href=`${url}?page=${i}`) #{i}
+
+                if endPage < pagination.totalPage
+                    if endPage < pagination.totalPage - 1
+                        li.page-item.disabled
+                            span.page-link ...
+                    li.page-item
+                        a.page-link(href=`${url}?page=${pagination.totalPage}`) #{pagination.totalPage}
+
+                if pagination.currentPage < pagination.totalPage
+                    li.page-item
+                        a.page-link(href=`${url}?page=${pagination.currentPage + 1}`)
+                            | Sau
+                            i.fas.fa-angle-right.ms-1
+                    li.page-item
+                        a.page-link.rounded-end(href=`${url}?page=${pagination.totalPage}`)
+                            | Cuối
+                            i.fas.fa-angle-double-right.ms-1
+
+        // Page info
+        .text-center.mt-3
+            .pagination-info.text-muted.small
+                | Trang #{pagination.currentPage} / #{pagination.totalPage} 

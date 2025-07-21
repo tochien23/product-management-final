@@ -1,10 +1,230 @@
-extend ../../layouts/default.pug
+extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
 
 block main 
-    .container.my-3
-        .row 
-            .col-12
-                +box-head("Thông tin tài khoản")
+    // Page Header
+    section.page-header.bg-light.py-4.mb-4
+        .container
+            .row.align-items-center
+                .col-md-8
+                    h1.page-title.fw-bold.mb-2
+                        i.fas.fa-user.text-primary.me-2
+                        | Thông tin tài khoản
+                    nav(aria-label="breadcrumb")
+                        ol.breadcrumb.mb-0
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/") Trang chủ
+                            li.breadcrumb-item.active(aria-current="page") Thông tin tài khoản
 
-        div #{user}
+    // User Profile Section
+    section.user-profile.py-4
+        .container
+            .row
+                // Profile Sidebar
+                .col-lg-4.mb-4
+                    .profile-sidebar.bg-white.rounded-3.shadow-sm.p-4.h-fit
+                        // Avatar Section
+                        .profile-avatar.text-center.mb-4
+                            .avatar-wrapper.position-relative.d-inline-block
+                                .avatar.rounded-circle.bg-primary.d-flex.align-items-center.justify-content-center.mx-auto.mb-3(style="width: 120px; height: 120px;")
+                                    i.fas.fa-user.fa-3x.text-white
+                                button.btn.btn-sm.btn-primary.position-absolute.bottom-0.end-0.rounded-circle(style="width: 35px; height: 35px;")
+                                    i.fas.fa-camera
+                            h4.profile-name.fw-bold.mb-1 #{user.fullName}
+                            p.profile-email.text-muted.mb-3 #{user.email}
+                            .profile-status
+                                span.badge.bg-success.px-3.py-2
+                                    i.fas.fa-check-circle.me-1
+                                    | Đã xác thực
+
+                        // Quick Stats
+                        .profile-stats.mb-4
+                            h6.fw-bold.mb-3
+                                i.fas.fa-chart-line.me-2
+                                | Thống kê
+                            .row.g-3
+                                .col-6
+                                    .stat-card.bg-light.rounded-3.p-3.text-center
+                                        .stat-number.fw-bold.text-primary.fs-5 0
+                                        .stat-label.small.text-muted Đơn hàng
+                                .col-6
+                                    .stat-card.bg-light.rounded-3.p-3.text-center
+                                        .stat-number.fw-bold.text-success.fs-5 0
+                                        .stat-label.small.text-muted Sản phẩm yêu thích
+
+                        // Quick Actions
+                        .profile-actions
+                            h6.fw-bold.mb-3
+                                i.fas.fa-cog.me-2
+                                | Thao tác nhanh
+                            .d-grid.gap-2
+                                a.btn.btn-outline-primary.btn-sm(href="/user/change-password")
+                                    i.fas.fa-lock.me-2
+                                    | Đổi mật khẩu
+                                a.btn.btn-outline-secondary.btn-sm(href="/user/orders")
+                                    i.fas.fa-shopping-bag.me-2
+                                    | Đơn hàng của tôi
+                                a.btn.btn-outline-warning.btn-sm(href="/user/wishlist")
+                                    i.fas.fa-heart.me-2
+                                    | Sản phẩm yêu thích
+                                a.btn.btn-outline-danger.btn-sm(href="/user/logout")
+                                    i.fas.fa-sign-out-alt.me-2
+                                    | Đăng xuất
+
+                // Main Content
+                .col-lg-8
+                    .profile-content.bg-white.rounded-3.shadow-sm.p-4
+                        // Profile Information Form
+                        .profile-form
+                            .d-flex.align-items-center.justify-content-between.mb-4
+                                h5.fw-bold.mb-0
+                                    i.fas.fa-edit.me-2
+                                    | Thông tin cá nhân
+                                button.btn.btn-primary.btn-sm.edit-profile-btn(type="button")
+                                    i.fas.fa-edit.me-1
+                                    | Chỉnh sửa
+
+                            form.profile-info-form
+                                .row.mb-3
+                                    .col-md-6
+                                        .form-floating
+                                            input.form-control(
+                                                type="text"
+                                                id="fullName"
+                                                name="fullName"
+                                                value=user.fullName
+                                                readonly
+                                            )
+                                            label(for="fullName")
+                                                i.fas.fa-user.me-2
+                                                | Họ và tên
+                                    .col-md-6
+                                        .form-floating
+                                            input.form-control(
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                value=user.email
+                                                readonly
+                                            )
+                                            label(for="email")
+                                                i.fas.fa-envelope.me-2
+                                                | Email
+
+                                .row.mb-3
+                                    .col-md-6
+                                        .form-floating
+                                            input.form-control(
+                                                type="tel"
+                                                id="phone"
+                                                name="phone"
+                                                value=user.phone || ""
+                                                placeholder="Số điện thoại"
+                                                readonly
+                                            )
+                                            label(for="phone")
+                                                i.fas.fa-phone.me-2
+                                                | Số điện thoại
+                                    .col-md-6
+                                        .form-floating
+                                            input.form-control(
+                                                type="date"
+                                                id="birthday"
+                                                name="birthday"
+                                                value=user.birthday || ""
+                                                readonly
+                                            )
+                                            label(for="birthday")
+                                                i.fas.fa-birthday-cake.me-2
+                                                | Ngày sinh
+
+                                .row.mb-3
+                                    .col-12
+                                        .form-floating
+                                            textarea.form-control(
+                                                id="address"
+                                                name="address"
+                                                placeholder="Địa chỉ"
+                                                style="height: 100px;"
+                                                readonly
+                                            ) #{user.address || ""}
+                                            label(for="address")
+                                                i.fas.fa-map-marker-alt.me-2
+                                                | Địa chỉ
+
+                                .form-actions.d-none
+                                    .d-flex.gap-2
+                                        button.btn.btn-success.save-btn(type="submit")
+                                            i.fas.fa-save.me-2
+                                            | Lưu thay đổi
+                                        button.btn.btn-secondary.cancel-btn(type="button")
+                                            i.fas.fa-times.me-2
+                                            | Hủy
+
+                        hr.my-4
+
+                        // Account Settings
+                        .account-settings
+                            h5.fw-bold.mb-4
+                                i.fas.fa-shield-alt.me-2
+                                | Cài đặt tài khoản
+                            
+                            .settings-list
+                                .setting-item.d-flex.align-items-center.justify-content-between.p-3.border.rounded-3.mb-3
+                                    .setting-info
+                                        .setting-title.fw-semibold Xác thực hai yếu tố
+                                        .setting-desc.text-muted.small Tăng cường bảo mật cho tài khoản
+                                    .form-check.form-switch
+                                        input.form-check-input(type="checkbox", id="twoFactor")
+                                        label.form-check-label(for="twoFactor")
+
+                                .setting-item.d-flex.align-items-center.justify-content-between.p-3.border.rounded-3.mb-3
+                                    .setting-info
+                                        .setting-title.fw-semibold Nhận email thông báo
+                                        .setting-desc.text-muted.small Nhận thông báo về đơn hàng và khuyến mãi
+                                    .form-check.form-switch
+                                        input.form-check-input(type="checkbox", id="emailNotification", checked)
+                                        label.form-check-label(for="emailNotification")
+
+                                .setting-item.d-flex.align-items-center.justify-content-between.p-3.border.rounded-3
+                                    .setting-info
+                                        .setting-title.fw-semibold Chia sẻ dữ liệu
+                                        .setting-desc.text-muted.small Cho phép chia sẻ dữ liệu để cải thiện dịch vụ
+                                    .form-check.form-switch
+                                        input.form-check-input(type="checkbox", id="dataSharing")
+                                        label.form-check-label(for="dataSharing")
+
+    // Custom JavaScript
+    script.
+        // Profile edit functionality
+        document.querySelector('.edit-profile-btn').addEventListener('click', function() {
+            const form = document.querySelector('.profile-info-form');
+            const inputs = form.querySelectorAll('input, textarea');
+            const actions = form.querySelector('.form-actions');
+            
+            inputs.forEach(input => {
+                if (input.name !== 'email') { // Keep email readonly
+                    input.removeAttribute('readonly');
+                    input.classList.add('border-primary');
+                }
+            });
+            
+            actions.classList.remove('d-none');
+            this.classList.add('d-none');
+        });
+        
+        // Cancel edit
+        document.querySelector('.cancel-btn').addEventListener('click', function() {
+            const form = document.querySelector('.profile-info-form');
+            const inputs = form.querySelectorAll('input, textarea');
+            const actions = form.querySelector('.form-actions');
+            const editBtn = document.querySelector('.edit-profile-btn');
+            
+            inputs.forEach(input => {
+                input.setAttribute('readonly', true);
+                input.classList.remove('border-primary');
+            });
+            
+            actions.classList.add('d-none');
+            editBtn.classList.remove('d-none');
+        });

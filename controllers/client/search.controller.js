@@ -6,10 +6,10 @@ const productsHelper = require("../../helpers/products");
 module.exports.index = async (req, res) => {
     const keyword = req.query.keyword;
 
-    let newProduct = [];
+    let newProducts = [];
 
-    if (keyword) {
-        const regax = new RegExp(keyword, "i");
+    if (keyword && keyword.trim() !== "") {
+        const regax = new RegExp(keyword.trim(), "i");
         const products = await Product.find({
             title: regax,
             deleted: false,
@@ -21,7 +21,7 @@ module.exports.index = async (req, res) => {
 
     res.render("client/pages/search/index", {
         pageTitle: "Kết quả tìm kiếm",
-        keyword: keyword,
+        keyword: keyword || "",
         products: newProducts
     });
 }

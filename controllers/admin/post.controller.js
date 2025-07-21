@@ -72,6 +72,7 @@ module.exports.index = async (req, res) => {
 
     res.render("admin/pages/posts/index", {
         pageTitle: "Quản lý bài viết",
+        currentPage: "posts",
         posts: posts,
         filterStatus: filterStatus,
         keyword: objectSearch.keyword,
@@ -131,6 +132,7 @@ module.exports.create = async (req, res) => {
 
     res.render("admin/pages/posts/create", {
         pageTitle: "Thêm mới bài viết",
+        currentPage: "posts",
         category: newCategory
     });
 }
@@ -176,6 +178,7 @@ module.exports.edit = async (req, res) => {
 
         res.render("admin/pages/posts/edit", {
             pageTitle: "Chỉnh sửa bài viết",
+            currentPage: "posts",
             post: post,
             category: newCategory
         });
@@ -227,6 +230,7 @@ module.exports.detail = async (req, res) => {
 
         res.render("admin/pages/posts/detail", {
             pageTitle: post.title,
+            currentPage: "posts",
             post: post
         });
     } catch (error) {

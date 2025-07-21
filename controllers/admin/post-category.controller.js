@@ -40,6 +40,7 @@ module.exports.index = async (req, res) => {
 
     res.render("admin/pages/posts-category/index", {
         pageTitle: "Danh mục bài viết",
+        currentPage: "posts-category",
         records: newRecords
     });
 };
@@ -126,6 +127,7 @@ module.exports.create = async (req, res) => {
 
     res.render("admin/pages/posts-category/create", {
         pageTitle: "Tạo danh mục bài viết",
+        currentPage: "posts-category",
         records: newRecords
     });
 }
@@ -164,6 +166,7 @@ module.exports.edit = async (req, res) => {
 
         res.render("admin/pages/posts-category/edit", {
             pageTitle: "Chỉnh sửa danh mục bài viết",
+            currentPage: "posts-category",
             data: data,
             records: newRecords
         });
@@ -207,6 +210,7 @@ module.exports.detail = async (req, res) => {
 
         res.render("admin/pages/posts-category/detail", {
             pageTitle: product.title,
+            currentPage: "posts-category",
             product: product
         });
     } catch (error) {

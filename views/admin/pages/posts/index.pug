@@ -11,119 +11,173 @@ block main
     if(role.permissions.includes("posts_view"))
         +alert-success(5000)
         
-        h1 Quản lý bài viết
+        // Header
+        .d-flex.justify-content-between.align-items-center.mb-4
+            h2.fw-bold.text-dark.mb-0 Quản lý bài viết
+            if(role.permissions.includes("posts_create"))
+                a.btn.btn-primary.px-4(href=`${prefixAdmin}/posts/create`)
+                    i.fas.fa-plus.me-2
+                    | Thêm mới
 
-        .card-mb-3
-            .card-header Bộ lọc và Tìm kiếm
-            .card-body
-            .row 
-                .col-6
+        // Filter Section
+        .row.g-3.mb-4
+            .col-md-6
+                .bg-white.p-3.rounded.border
+                    label.form-label.fw-semibold.mb-2 Trạng thái
+                    br
                     +filter-status(filterStatus)
-                .col-6 
+            .col-md-6
+                .bg-white.p-3.rounded.border
+                    label.form-label.fw-semibold.mb-2 Tìm kiếm
                     +search(keyword)
-        .card-mb-3
-            .card-header 
-                .card-body
-                    .row 
-                        .col-4 
-                            if(role.permissions.includes("posts_create"))
-                                a(
-                                    href=`${prefixAdmin}/posts/create`
-                                    class="btn btn-outline-success"
-                                ) + Thêm mới
 
-        .card-mb-3
-            .card-header Danh sách bài viết
-                .card-body 
+        // Multi Action
+        if(role.permissions.includes("posts_edit"))
+            .mb-3
+                +form-change-multi(`${prefixAdmin}/posts/change-multi?_method=PATCH`)
 
-                    table(
-                        class="table table-hover table-sm"
-                        checkbox-multi
-                    )
-                        thead 
-                            tr 
-                                th  
-                                    input(type="checkbox" name="checkall")
-                                th STT 
-                                th Tiêu đề
-                                th Ảnh minh họa
-                                th Nội dung bài viết
-                                th Trạng thái 
-                                th Người tạo 
-                                th Hành động
+        // Posts Table
+        .bg-white.rounded-3.shadow-sm.overflow-hidden
+            .table-responsive
+                table.table.table-hover.mb-0.admin-table(checkbox-multi)
+                    thead
+                        tr
+                            th.py-4.px-4.border-0.text-center(width="60" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                .custom-control.custom-checkbox
+                                    input.custom-control-input.form-check-input(type="checkbox" name="checkall" id="checkall-posts")
+                                    label.custom-control-label(for="checkall-posts")
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="70" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-hashtag.me-1
+                                | STT
+                            th.py-4.border-0.fw-bold.text-muted(width="250" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-newspaper.me-1
+                                | Tiêu đề bài viết
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-image.me-1
+                                | Ảnh minh họa
+                            th.py-4.border-0.fw-bold.text-muted(width="200" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-align-left.me-1
+                                | Mô tả
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="130" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-toggle-on.me-1
+                                | Trạng thái
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="150" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-user.me-1
+                                | Người tạo
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="160" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-cogs.me-1
+                                | Thao tác
 
-                        tbody 
-                            each item, index in posts
-                                tr 
-                                    td 
-                                        input(
+                    tbody
+                        each item, index in posts
+                            tr.table-row-hover.align-middle
+                                td.px-4.text-center
+                                    .custom-control.custom-checkbox
+                                        input.custom-control-input(
                                             type="checkbox"
                                             name="id"
-                                            value=item.id 
+                                            value=item.id
+                                            id=`checkbox-post-${item.id}`
                                         )
-                                    td #{pagination.limitItems*(pagination.currentPage - 1) + (index + 1)}
-                                    td #{item.title}
-                                    td 
-                                        img(
-                                            src= item.thumbnail
-                                            alt= item.title
-                                            width="100px"
-                                            height="auto"
+                                        label.custom-control-label(for=`checkbox-post-${item.id}`)
+                                
+                                td.text-center.fw-bold.text-muted
+                                    | #{pagination.limitItems*(pagination.currentPage - 1) + (index + 1)}
+                                
+                                td.align-middle
+                                    .fw-semibold.text-dark #{item.title}
+                                    .small.text-muted.mt-1 ID: #{item.id}
+                                
+                                td.text-center.align-middle
+                                    .thumbnail-container
+                                        img.rounded.shadow-sm(
+                                            src=item.thumbnail
+                                            alt=item.title
+                                            style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #e9ecef;"
+                                            onerror="this.src='/images/150x150.svg'"
                                         )
-                                    td !{item.description}
-                                    td
-                                        if(role.permissions.includes("products_edit"))
-                                            if(item.status == "active")
-                                                a(href="javascript:;" 
-                                                data-status = item.status
+                                
+                                td.align-middle
+                                    .post-description(style="max-width: 200px; overflow: hidden;")
+                                        .text-muted.small !{item.description}
+                                
+                                td.text-center.align-middle
+                                    if(role.permissions.includes("posts_edit"))
+                                        if(item.status == "active")
+                                            a.status-badge.badge.bg-success.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                                                href="javascript:;" 
+                                                data-status=item.status
                                                 data-id=item.id
                                                 button-change-status
-                                                class="badge badge-success"
-                                                ) Hoạt động 
-                                            else 
-                                                a(href="javascript:;" 
-                                                data-status = item.status
+                                                title="Nhấp để thay đổi trạng thái"
+                                                style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                                            )
+                                                i.fas.fa-check-circle.me-1
+                                                | Hoạt động
+                                        else
+                                            a.status-badge.badge.bg-danger.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                                                href="javascript:;" 
+                                                data-status=item.status
                                                 data-id=item.id
                                                 button-change-status
-                                                class="badge badge-danger"
-                                                ) Dừng hoạt động 
-                                    td 
-                                        p #{item.accountFullName}
-                                        //- if(item.createdBy.createdAt)
-                                        p 
+                                                title="Nhấp để thay đổi trạng thái"
+                                                style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                                            )
+                                                i.fas.fa-times-circle.me-1
+                                                | Dừng hoạt động
+                                    else
+                                        if(item.status == "active")
+                                            span.badge.bg-success.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                                                i.fas.fa-check-circle.me-1
+                                                | Hoạt động
+                                        else
+                                            span.badge.bg-danger.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                                                i.fas.fa-times-circle.me-1
+                                                | Dừng hoạt động
+                                
+                                td.text-center.align-middle
+                                    .small
+                                        .fw-semibold #{item.accountFullName}
+                                        .text-muted
                                             +formatDateTime(item.createdBy.createdAt)
-                                    td 
-                                        a(
+                                
+                                td.text-center.align-middle
+                                    .btn-group.btn-group-sm(role="group")
+                                        a.btn.btn-outline-info.btn-sm.rounded-pill.me-1(
                                             href=`${prefixAdmin}/posts/detail/${item.id}`
-                                            class="btn btn-secondary btn-sm"
-                                        ) Chi tiết
+                                            title="Xem chi tiết"
+                                        )
+                                            i.fas.fa-eye.me-1
+                                        
                                         if(role.permissions.includes("posts_edit"))
-                                            a(
+                                            a.btn.btn-outline-warning.btn-sm.rounded-pill.me-1(
                                                 href=`${prefixAdmin}/posts/edit/${item.id}`
-                                                class="btn btn-warning btn-sm"
-                                            ) Sửa
+                                                title="Chỉnh sửa"
+                                            )
+                                                i.fas.fa-edit.me-1
+                                        
                                         if(role.permissions.includes("posts_delete"))
-                                            button(
-                                                class="btn btn-danger btn-sm ml-1"
+                                            button.btn.btn-outline-danger.btn-sm.rounded-pill(
                                                 button-delete
                                                 data-id=item.id
-                                            ) Xóa
-                                        
-        //- //Phân trang
-        +pagination(pagination)
+                                                title="Xóa bài viết"
+                                            )
+                                                i.fas.fa-trash-alt.me-1
+        // Pagination
+        .d-flex.justify-content-center.mt-4
+            +pagination(pagination)
 
-        form(
+        // Hidden Forms
+        form#form-change-status(
             action=""
             method="POST"
-            id="form-change-status"
             data-path=`${prefixAdmin}/posts/change-status`
-        ) 
+        )
 
-        form(
+        form#form-delete-item(
             action=""
             method="POST"
-            id="form-delete-item"
             data-path=`${prefixAdmin}/posts/delete`
-        ) 
+        )
 
         script(src="/admin/js/product.js") 

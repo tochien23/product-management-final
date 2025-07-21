@@ -1,29 +1,717 @@
 extends ../../layouts/default.pug
+include ../../mixins/alert.pug
 
 block main 
-    if (account.fullName)
-        div(class="mb-4") Họ tên: <b>#{account.fullName}</b>
-    if (account.email)
-        div(class="mb-4") Email: <b>#{account.email}</b>
-    if (account.phone)
-        div(class="mb-4") Số điện thoại: <b>#{account.phone}</b>
-    if (account.avatar)
-        div(class="mb-4") 
-            img(
-                src=account.avatar
-                style="width= 100px, height=auto"
-            )
-    if (account.status)
-        div(class="mb-4") 
-            span Trạng thái: 
-            if (account.status === "active")
-                span(class="badge badge-success") Hoạt động
-            else 
-                span(class="badge badge-danger") Dừng hoạt động
-    
-    a(
-        href=`${prefixAdmin}/accounts/edit/${account.id}`
-        class="btn btn-warning"       
-    ) Chỉnh sửa
+    +alert-success(5000)
 
-    script(src="/admin/js/product.js") 
+    .account-detail-container
+        // Header Section
+        .page-header
+            .header-content
+                .header-info
+                    .breadcrumb-nav.mb-2
+                        a.breadcrumb-link(href=`${prefixAdmin}/accounts`)
+                            i.fas.fa-arrow-left.me-2
+                            span Quay lại danh sách
+                        .breadcrumb-separator /
+                        span.breadcrumb-current Chi tiết tài khoản
+                    
+                    .page-title-group
+                        h1.page-title
+                            i.fas.fa-user.me-3
+                            span #{account.fullName || 'Không có tên'}
+                        if(account.email)
+                            .account-badge.mt-2
+                                i.fas.fa-envelope.me-1
+                                span #{account.email}
+
+                .header-actions
+                    if(role.permissions && role.permissions.includes("accounts_edit"))
+                        a.btn-primary(href=`${prefixAdmin}/accounts/edit/${account.id}`)
+                            i.fas.fa-edit.me-2
+                            span Chỉnh sửa
+                    if(account.status == "active")
+                        a.btn-success(href="#" target="_blank")
+                            i.fas.fa-user-check.me-2
+                            span Hoạt động
+
+        // Main Content
+        .detail-content
+            .content-grid
+                // Left Column - Avatar & Meta Information
+                .detail-sidebar
+                    // Avatar Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-user-circle.me-2
+                                span Ảnh đại diện
+                        
+                        .card-content
+                            .avatar-container
+                                if (account.avatar)
+                                    .account-avatar
+                                        img.avatar-image(
+                                            src=account.avatar
+                                            alt=account.fullName
+                                            onerror="this.src='/images/150x150.svg'"
+                                        )
+                                        .image-overlay
+                                            .overlay-content
+                                                i.fas.fa-search-plus
+                                                span Xem lớn
+                                else
+                                    .no-avatar-placeholder
+                                        i.fas.fa-user.placeholder-icon
+                                        .placeholder-text Chưa có ảnh đại diện
+                                        .placeholder-subtext Tài khoản chưa được thêm ảnh
+
+                    // Meta Information Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin chi tiết
+                        
+                        .card-content
+                            .meta-grid
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-fingerprint.me-2
+                                        span ID tài khoản
+                                    .meta-value.text-primary #{account.id}
+
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-toggle-on.me-2
+                                        span Trạng thái
+                                    .meta-value
+                                        if(account.status == "active")
+                                            .status-badge.status-active
+                                                i.fas.fa-check-circle.me-1
+                                                span Hoạt động
+                                        else
+                                            .status-badge.status-inactive
+                                                i.fas.fa-ban.me-1
+                                                span Tạm khóa
+
+                                if(account.role)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-user-tag.me-2
+                                            span Nhóm quyền
+                                        .meta-value #{account.role.title || account.role}
+
+                                if(account.createdAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-plus.me-2
+                                            span Ngày tạo
+                                        .meta-value #{new Date(account.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                                if(account.updatedAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-edit.me-2
+                                            span Cập nhật lần cuối
+                                        .meta-value #{new Date(account.updatedAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                // Right Column - Account Information
+                .detail-main
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-address-card.me-2
+                                span Thông tin liên hệ
+                        
+                        .card-content
+                            .contact-area
+                                .contact-item
+                                    .contact-label
+                                        i.fas.fa-user.me-2
+                                        span Họ và tên
+                                    .contact-value
+                                        if (account.fullName)
+                                            .account-name #{account.fullName}
+                                        else
+                                            .no-content-placeholder Chưa cập nhật
+                                
+                                .contact-item
+                                    .contact-label
+                                        i.fas.fa-envelope.me-2
+                                        span Email
+                                    .contact-value
+                                        if (account.email)
+                                            a.email-link(href=`mailto:${account.email}`) #{account.email}
+                                        else
+                                            .no-content-placeholder Chưa có email
+                            
+                                if(account.phone)
+                                    .contact-item
+                                        .contact-label
+                                            i.fas.fa-phone.me-2
+                                            span Số điện thoại
+                                        .contact-value
+                                            a.phone-link(href=`tel:${account.phone}`) #{account.phone}
+
+                                if(account.address)
+                                    .contact-item
+                                        .contact-label
+                                            i.fas.fa-map-marker-alt.me-2
+                                            span Địa chỉ
+                                        .contact-value.address-text #{account.address}
+
+            // Permissions Section
+            if(account.role && account.role.permissions && account.role.permissions.length > 0)
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-key.me-2
+                            span Quyền hạn
+                    
+                    .card-content
+                        .permissions-area
+                            .permissions-grid
+                                each permission in account.role.permissions
+                                    .permission-item
+                                        i.fas.fa-check-circle.me-2
+                                        span #{permission}
+
+            // Action Section
+            .action-section
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-cogs.me-2
+                            span Thao tác quản lý
+                    
+                    .card-content
+                        .action-buttons
+                            if(role.permissions && role.permissions.includes("accounts_edit"))
+                                a.btn-primary(href=`${prefixAdmin}/accounts/edit/${account.id}`)
+                                    i.fas.fa-edit.me-2
+                                    span Chỉnh sửa tài khoản
+                            
+                            a.btn-secondary(href=`${prefixAdmin}/accounts`)
+                                i.fas.fa-list.me-2
+                                span Danh sách tài khoản
+                            
+                            if(account.status == "active")
+                                button.btn-warning(type="button")
+                                    i.fas.fa-ban.me-2
+                                    span Khóa tài khoản
+                            else
+                                button.btn-success(type="button")
+                                    i.fas.fa-check.me-2
+                                    span Kích hoạt
+                            
+                            if(role.permissions && role.permissions.includes("accounts_delete"))
+                                button.btn-danger(
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                )
+                                    i.fas.fa-trash-alt.me-2
+                                    span Xóa tài khoản
+
+    // Delete Confirmation Modal
+    if(role.permissions && role.permissions.includes("accounts_delete"))
+        .modal.fade#deleteModal(tabindex="-1")
+            .modal-dialog.modal-dialog-centered
+                .modal-content
+                    .modal-header.border-0
+                        h5.modal-title.text-danger
+                            i.fas.fa-exclamation-triangle.me-2
+                            | Xác nhận xóa tài khoản
+                        button.btn-close(type="button" data-bs-dismiss="modal")
+                    .modal-body.text-center.py-4
+                        .delete-icon.mb-3
+                            i.fas.fa-trash-alt.fa-3x.text-danger.opacity-50
+                        p.mb-3.h6 Bạn có chắc chắn muốn xóa tài khoản này?
+                        .alert.alert-warning.text-start
+                            strong #{account.fullName}
+                        p.text-muted.small Hành động này không thể hoàn tác
+                    .modal-footer.border-0.justify-content-center
+                        button.btn.btn-secondary.px-4(type="button" data-bs-dismiss="modal") Hủy bỏ
+                        a.btn.btn-danger.px-4(href=`${prefixAdmin}/accounts/delete/${account.id}`) Xóa tài khoản
+
+    style.
+        .account-detail-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: #6c757d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #adb5bd;
+        }
+
+        .breadcrumb-current {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .page-title i {
+            color: #3498db;
+            font-size: 28px;
+        }
+
+        .account-badge {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-warning, .btn-danger {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            text-decoration: none;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .detail-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #3498db;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .avatar-container {
+            text-align: center;
+        }
+
+        .account-avatar {
+            position: relative;
+            display: inline-block;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .avatar-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .account-avatar:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .account-avatar:hover .avatar-image {
+            transform: scale(1.05);
+        }
+
+        .overlay-content {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .overlay-content i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-avatar-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .contact-area {
+            line-height: 1.8;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .contact-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-value {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .account-name {
+            font-weight: 600;
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .email-link, .phone-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .email-link:hover, .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-content-placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .address-text {
+            line-height: 1.6;
+        }
+
+        .permissions-area {
+            line-height: 1.8;
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            font-size: 14px;
+            font-weight: 500;
+            color: #155724;
+            transition: transform 0.2s ease;
+        }
+
+        .permission-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .permission-item i {
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .action-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .delete-icon {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-sidebar {
+                order: 2;
+            }
+
+            .detail-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .account-detail-container {
+                padding: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                align-self: stretch;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn-primary,
+            .header-actions .btn-success {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn-primary,
+            .action-buttons .btn-secondary,
+            .action-buttons .btn-success,
+            .action-buttons .btn-warning,
+            .action-buttons .btn-danger {
+                justify-content: center;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    script(src="/admin/js/product.js")

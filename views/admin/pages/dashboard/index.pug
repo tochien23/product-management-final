@@ -1,52 +1,174 @@
-extend ../../layouts/default.pug
+extends ../../layouts/default.pug
 
 block main
-    h1 Trang tổng quan
+    // Page Header
+    .d-flex.justify-content-between.align-items-center.mb-4
+        div
+            h1.h2.mb-1.fw-bold.text-dark Dashboard
+            p.text-muted.mb-0 Chào mừng trở lại, #{user.fullName}!
+        .text-end
+            .badge.bg-success.fs-6.px-3.py-2
+                i.fas.fa-circle.me-2(style="font-size: 8px;")
+                | Online
 
-    .row.mt-4 
-        .col-12 
-            .card.mb-4 
-                .card-header Thông tin tài khoản
-                .card-body 
-                    if (user.avatar)
-                        img(src=user.avatar 
-                        style="height: 100px; margin-bottom: 15px"
-                    )
+    // Statistics Cards Row
+    .row.g-4.mb-4
+        .col-xl-3.col-md-6
+            .card.border-0.shadow-sm.h-100.stats-card
+                .card-body.p-4
+                    .d-flex.align-items-center.justify-content-between
+                        div
+                            .text-primary.mb-2
+                                i.fas.fa-box.fa-2x
+                            h3.h4.fw-bold.text-dark.mb-1 #{statistic.product.total || 0}
+                            p.text-muted.mb-0.small Tổng sản phẩm
+                        .text-end
+                            .text-success.small.fw-medium
+                                i.fas.fa-arrow-up.me-1
+                                | #{statistic.product.active || 0} hoạt động
+                    .progress.mt-3(style="height: 4px;")
+                        .progress-bar.bg-primary(role="progressbar" style="width: 75%")
 
-                    if (user.fullName)
-                        p Họ tên: <b>#{user.fullName}</b>
-                    if (user.email)
-                        p Email: <b>#{user.email}</b>
-                    if (user.phone)
-                        p Số điện thoại: <b>#{user.phone}</b>
-                    if (role.title)
-                        p Phân quyền: <b>#{role.title}</b>
+        .col-xl-3.col-md-6
+            .card.border-0.shadow-sm.h-100.stats-card
+                .card-body.p-4
+                    .d-flex.align-items-center.justify-content-between
+                        div
+                            .text-success.mb-2
+                                i.fas.fa-tags.fa-2x
+                            h3.h4.fw-bold.text-dark.mb-1 #{statistic.categoryProduct.total || 0}
+                            p.text-muted.mb-0.small Danh mục sản phẩm
+                        .text-end
+                            .text-success.small.fw-medium
+                                i.fas.fa-arrow-up.me-1
+                                | #{statistic.categoryProduct.active || 0} hoạt động
+                    .progress.mt-3(style="height: 4px;")
+                        .progress-bar.bg-success(role="progressbar" style="width: 85%")
 
-        .col-6 
-            .card.mb-4
-                .card-header Sản phẩm 
-                .card-body 
-                    p Số lượng: <b>#{statistic.product.total}</b>
-                    p Hoạt động: <b>#{statistic.product.active}</b>
-                    p Dừng hoạt động: <b>#{statistic.product.inactive}</b>
-        .col-6 
-            .card.mb-4
-                .card-header Danh mục sản phẩm 
-                .card-body 
-                    p Số lượng: <b>#{statistic.categoryProduct.total}</b>
-                    p Hoạt động: <b>#{statistic.categoryProduct.active}</b>
-                    p Dừng hoạt động: <b>#{statistic.categoryProduct.inactive}</b>
-        .col-6 
-            .card.mb-4
-                .card-header Tài khoản admin
-                .card-body 
-                    p Số lượng: <b>#{statistic.account.total}</b>
-                    p Hoạt động: <b>#{statistic.account.active}</b>
-                    p Dừng hoạt động: <b>#{statistic.account.inactive}</b>
-        .col-6 
-            .card.mb-4
-                .card-header Tài khoản client 
-                .card-body 
-                    p Số lượng: <b>#{statistic.user.total}</b>
-                    p Hoạt động: <b>#{statistic.user.active}</b>
-                    p Dừng hoạt động: <b>#{statistic.user.inactive}</b>
+        .col-xl-3.col-md-6
+            .card.border-0.shadow-sm.h-100.stats-card
+                .card-body.p-4
+                    .d-flex.align-items-center.justify-content-between
+                        div
+                            .text-info.mb-2
+                                i.fas.fa-user-shield.fa-2x
+                            h3.h4.fw-bold.text-dark.mb-1 #{statistic.account.total || 0}
+                            p.text-muted.mb-0.small Tài khoản admin
+                        .text-end
+                            .text-success.small.fw-medium
+                                i.fas.fa-arrow-up.me-1
+                                | #{statistic.account.active || 0} hoạt động
+                    .progress.mt-3(style="height: 4px;")
+                        .progress-bar.bg-info(role="progressbar" style="width: 90%")
+
+        .col-xl-3.col-md-6
+            .card.border-0.shadow-sm.h-100.stats-card
+                .card-body.p-4
+                    .d-flex.align-items-center.justify-content-between
+                        div
+                            .text-warning.mb-2
+                                i.fas.fa-users.fa-2x
+                            h3.h4.fw-bold.text-dark.mb-1 #{statistic.user.total || 0}
+                            p.text-muted.mb-0.small Khách hàng
+                        .text-end
+                            .text-success.small.fw-medium
+                                i.fas.fa-arrow-up.me-1
+                                | #{statistic.user.active || 0} hoạt động
+                    .progress.mt-3(style="height: 4px;")
+                        .progress-bar.bg-warning(role="progressbar" style="width: 80%")
+
+    // Main Content Row
+    .row.g-4
+        // User Profile Card
+        .col-lg-4
+            .card.border-0.shadow-sm.h-100
+                .card-header.bg-white.border-0.pb-0
+                    h5.card-title.mb-0.fw-semibold
+                        i.fas.fa-user-circle.text-primary.me-2
+                        | Thông tin tài khoản
+                .card-body.p-4
+                    .text-center.mb-4
+                        .user-avatar.mx-auto.mb-3.position-relative
+                            if (user.avatar)
+                                img.rounded-circle.border.border-3.border-primary(src=user.avatar style="width: 100px; height: 100px; object-fit: cover;")
+                            else
+                                .bg-primary.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 100px; height: 100px;")
+                                    i.fas.fa-user.text-white.fa-3x
+                            .position-absolute.bottom-0.end-0
+                                .badge.bg-success.rounded-pill.border.border-2.border-white
+                                    i.fas.fa-check.small
+                        h5.fw-bold.text-dark.mb-1 #{user.fullName}
+                        p.text-muted.mb-0 #{user.email}
+                    
+                    .user-info
+                        if (user.phone)
+                            .d-flex.align-items-center.mb-3
+                                .icon-wrapper.me-3
+                                    i.fas.fa-phone.text-primary
+                                div
+                                    .small.text-muted Số điện thoại
+                                    .fw-medium #{user.phone}
+                        
+                        if (role.title)
+                            .d-flex.align-items-center.mb-3
+                                .icon-wrapper.me-3
+                                    i.fas.fa-shield-alt.text-success
+                                div
+                                    .small.text-muted Vai trò
+                                    .fw-medium #{role.title}
+                        
+                        .d-flex.align-items-center.mb-0
+                            .icon-wrapper.me-3
+                                i.fas.fa-clock.text-info
+                            div
+                                .small.text-muted Trạng thái
+                                .badge.bg-success-subtle.text-success.fw-medium Đang hoạt động
+
+        // Quick Actions & Overview
+        .col-lg-8
+            .card.border-0.shadow-sm.h-100
+                .card-header.bg-white.border-0.pb-0
+                    h5.card-title.mb-0.fw-semibold
+                        i.fas.fa-bolt.text-warning.me-2
+                        | Thao tác nhanh & Tổng quan
+                .card-body.p-4
+                    // Quick Actions
+                    .row.g-3.mb-4
+                        .col-md-4
+                            a.btn.btn-primary.w-100.py-3.text-decoration-none(href=`${prefixAdmin}/products/create`)
+                                .d-flex.flex-column.align-items-center
+                                    i.fas.fa-plus.fa-2x.mb-2
+                                    span.fw-medium Thêm sản phẩm
+                        .col-md-4
+                            a.btn.btn-success.w-100.py-3.text-decoration-none(href=`${prefixAdmin}/posts/create`)
+                                .d-flex.flex-column.align-items-center
+                                    i.fas.fa-edit.fa-2x.mb-2
+                                    span.fw-medium Viết bài mới
+                        .col-md-4
+                            a.btn.btn-info.w-100.py-3.text-decoration-none(href=`${prefixAdmin}/accounts/create`)
+                                .d-flex.flex-column.align-items-center
+                                    i.fas.fa-user-plus.fa-2x.mb-2
+                                    span.fw-medium Thêm tài khoản
+
+                    // Quick Overview
+                    .border-top.pt-4
+                        h6.fw-semibold.mb-3.text-dark
+                            i.fas.fa-chart-pie.text-primary.me-2
+                            | Tổng quan nhanh
+                        .row.g-3
+                            .col-6
+                                .text-center.p-3.bg-light.rounded
+                                    .h5.fw-bold.text-primary.mb-1 #{(statistic.product.total || 0) + (statistic.categoryProduct.total || 0)}
+                                    .small.text-muted Tổng nội dung
+                            .col-6
+                                .text-center.p-3.bg-light.rounded
+                                    .h5.fw-bold.text-success.mb-1 #{(statistic.account.total || 0) + (statistic.user.total || 0)}
+                                    .small.text-muted Tổng người dùng
+                            .col-12.mt-3
+                                .alert.alert-info.border-0.bg-info.bg-opacity-10.mb-0
+                                    .d-flex.align-items-center
+                                        i.fas.fa-info-circle.text-info.me-2
+                                        div
+                                            .fw-medium.text-info Hệ thống hoạt động tốt
+                                            .small.text-muted Tất cả các dịch vụ đang online và stable
+

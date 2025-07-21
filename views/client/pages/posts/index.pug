@@ -1,20 +1,86 @@
 extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
-block main 
-    .container.my-3 
-        .row 
-            .col-12 
-               +box-head("Danh sách bài viết") 
+include ../../mixins/moment.pug
 
-        .row 
-            each item in posts 
-                .col-4.mb-3 
-                    .product-item 
-                        .inner-image    
-                            img(
-                                //- src=item.thumbnail
-                                alt=item.title
-                            )
-                        .inner-content 
-                            h3.inner-title
-                                a(href=`/posts/${item.slug}`) #{item.title}
+block main 
+    // Breadcrumb Section
+    .bg-light.py-3.border-bottom
+        .container
+            nav(aria-label="breadcrumb")
+                ol.breadcrumb.mb-0
+                    li.breadcrumb-item
+                        a.text-decoration-none(href="/")
+                            i.fas.fa-home.me-1
+                            | Trang chủ
+                    li.breadcrumb-item.active(aria-current="page")
+                        i.fas.fa-blog.me-1
+                        | Blog & Tin tức
+
+    // Main Content
+    .container.mb-5
+        if posts && posts.length > 0
+            .row.g-4
+                each item in posts 
+                    .col-lg-4.col-md-6.col-sm-12
+                        .card.h-100.border-0.shadow-sm
+                            // Post Image
+                            if item.thumbnail
+                                img.card-img-top(
+                                    src=item.thumbnail
+                                    alt=item.title
+                                    style="height: 220px; object-fit: cover;"
+                                )
+                            else
+                                .bg-light.d-flex.align-items-center.justify-content-center(style="height: 220px;")
+                                    i.fas.fa-file-alt.fa-3x.text-muted
+
+                            // Post Content
+                            .card-body.p-4
+                                // Category Badge
+                                if item.post_category_id && item.post_category_id.title
+                                    .badge.bg-primary.mb-2
+                                        | #{item.post_category_id.title}
+
+                                // Post Title
+                                h3.card-title.h5.fw-bold.mb-3
+                                    a.text-decoration-none.text-dark(href=`/posts/${item.slug}`) 
+                                        | #{item.title}
+
+                                // Post Meta
+                                .text-muted.small.mb-3
+                                    i.fas.fa-calendar-alt.me-1
+                                    +formatDateTime(item.createdAt)
+                                    if item.author
+                                        span.ms-3
+                                            i.fas.fa-user.me-1
+                                            | #{item.author}
+
+                                // Post Description
+                                if item.description
+                                    p.card-text.text-muted.mb-3
+                                        | #{item.description.substring(0, 120)}...
+
+                                // Post Stats
+                                .d-flex.justify-content-between.align-items-center.mt-auto
+                                    .small.text-muted
+                                        span.me-3
+                                            i.fas.fa-eye.me-1
+                                            | #{item.views || 0}
+                                        span
+                                            i.fas.fa-comment.me-1
+                                            | #{item.comments || 0}
+                                    
+                                    a.btn.btn-outline-primary.btn-sm(href=`/posts/${item.slug}`)
+                                        | Đọc tiếp
+                                        i.fas.fa-arrow-right.ms-1
+
+        else
+            // Empty State
+            .text-center.py-5
+                .mb-4
+                    i.fas.fa-file-alt.fa-5x.text-muted
+                h4.text-muted.mb-3 Chưa có bài viết nào
+                p.text-muted.mb-4 Hiện tại chưa có bài viết nào được đăng tải.
+                a.btn.btn-primary(href="/")
+                    i.fas.fa-home.me-2
+                    | Về trang chủ

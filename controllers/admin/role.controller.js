@@ -35,6 +35,7 @@ module.exports.index = async (req, res) => {
 
     res.render("admin/pages/roles/index", {
         pageTitle: "Nhóm quyền",
+        currentPage: "roles",
         records: records
     });
 };
@@ -43,6 +44,7 @@ module.exports.index = async (req, res) => {
 module.exports.create = async (req, res) => {
     res.render("admin/pages/roles/create", {
         pageTitle: "Tạo nhóm quyền",
+        currentPage: "roles"
     });
 }
 
@@ -94,6 +96,7 @@ module.exports.edit = async (req, res) => {
 
         res.render("admin/pages/roles/edit", {
             pageTitle: "Chỉnh sửa nhóm quyền",
+            currentPage: "roles",
             data: data
         });
     } catch (error) {
@@ -136,6 +139,7 @@ module.exports.detail = async (req, res) => {
 
         res.render("admin/pages/roles/detail", {
             pageTitle: role.title,
+            currentPage: "roles",
             role: role
         });
     } catch (error) {
@@ -153,6 +157,7 @@ module.exports.permissions = async (req, res) => {
 
     res.render("admin/pages/roles/permissions", {
         pageTitle: "Phân quyền",
+        currentPage: "permissions",
         records: records
     });
 }

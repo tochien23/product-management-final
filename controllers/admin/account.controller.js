@@ -23,6 +23,7 @@ module.exports.index = async (req, res) => {
 
     res.render("admin/pages/accounts/index", {
         pageTitle: "Danh sách tài khoản",
+        currentPage: "accounts",
         records: records
     });
 };
@@ -49,6 +50,7 @@ module.exports.create = async (req, res) => {
 
     res.render("admin/pages/accounts/create", {
         pageTitle: "Tạo mới tài khoản",
+        currentPage: "accounts",
         roles: roles
     });
 };
@@ -89,6 +91,7 @@ module.exports.edit = async (req, res) => {
 
         res.render("admin/pages/accounts/edit", {
             pageTitle: "Chỉnh sửa tài khoản",
+            currentPage: "accounts",
             data: data,
             roles: roles
         });
@@ -134,11 +137,33 @@ module.exports.detail = async (req, res) => {
 
         const account = await Account.findOne(find);
 
+        // Lấy thông tin role của account
+        if (account.role_id) {
+            const role = await Role.findOne({
+                _id: account.role_id,
+                deleted: false
+            });
+            account.role = role;
+        }
+
         res.render("admin/pages/accounts/detail", {
-            pageTitle: account.title,
+            pageTitle: account.fullName || "Chi tiết tài khoản",
+            currentPage: "accounts",
             account: account
         });
     } catch (error) {
         res.redirect(`${systemConfig.prefixAdmin}/accounts`);
     }
+};
+
+// [PATCH] / admin / accounts / change-status / :id
+module.exports.changeStatus = async (req, res) => {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    await Account.updateOne({ _id: id }, { status: status });
+
+    req.flash("success", "Cập nhật trạng thái thành công!");
+
+    res.redirect("back");
 };

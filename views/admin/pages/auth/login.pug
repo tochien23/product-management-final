@@ -4,34 +4,106 @@ include ../../mixins/alert.pug
 block main
     +alert-error(5000)
 
-    .container.my-5 
-        .row.justify-content-center
-            .col-8
-                h1(class="text-center") Đăng nhập
-                form(
-                    action=`${prefixAdmin}/auth/login`
-                    method="POST"
-                )
-                    div(class="form-group")
-                        label(for="email") Email
-                        input(
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            required 
-                        )
-                    div(class="form-group")
-                        label(for="password") Mật khẩu
-                        input(
+    .login-wrapper
+        .login-container
+            .login-header.text-center.mb-4
+                .login-logo.mb-3
+                    i.fas.fa-user-shield.fa-3x.text-primary
+                h2.login-title.mb-2 Đăng nhập Admin
+                p.login-subtitle.text-muted Vui lòng đăng nhập để tiếp tục
+                
+            form.login-form(action=`${prefixAdmin}/auth/login` method="POST")
+                .form-group.mb-3
+                    label.form-label(for="email") 
+                        i.fas.fa-envelope.me-2
+                        | Email
+                    input#email.form-control(
+                        type="email"
+                        name="email"
+                        placeholder="Nhập địa chỉ email của bạn"
+                        required
+                        autocomplete="email"
+                    )
+                
+                .form-group.mb-3
+                    label.form-label(for="password")
+                        i.fas.fa-lock.me-2
+                        | Mật khẩu
+                    .password-field
+                        input#password.form-control(
                             type="password"
-                            class="form-control"
-                            id="password"
                             name="password"
-                            required 
+                            placeholder="Nhập mật khẩu"
+                            required
+                            autocomplete="current-password"
                         )
-                    div(class="form-group")
-                        button(
-                            type="submit"
-                            class="btn btn-primary btn-block"
-                        ) Đăng nhập
+                        button.password-toggle(type="button" onclick="togglePassword()")
+                            i#toggleIcon.fas.fa-eye
+                
+                .form-group.mb-4
+                    .form-check
+                        input#remember.form-check-input(type="checkbox" name="remember")
+                        label.form-check-label(for="remember") Ghi nhớ đăng nhập
+                
+                .form-group.mb-3
+                    button.btn.btn-primary.btn-block.login-btn(type="submit")
+                        i.fas.fa-sign-in-alt.me-2
+                        | Đăng nhập
+                        .spinner-border.spinner-border-sm.ms-2.d-none
+
+            .login-footer.text-center.mt-4
+                .divider.my-3
+                .security-note.small.text-muted
+                    i.fas.fa-shield-alt.me-1
+                    | Trang này được bảo vệ bởi SSL
+    
+    script.
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login-form');
+            const submitBtn = document.querySelector('.login-btn');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            
+            // Auto focus email
+            document.getElementById('email').focus();
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                spinner.classList.remove('d-none');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng nhập...';
+            });
+            
+            // Input animations
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+                
+                // Check if already has value
+                if (input.value) {
+                    input.parentElement.classList.add('focused');
+                }
+            });
+        });

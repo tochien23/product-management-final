@@ -1,0 +1,242 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+include ../../mixins/alert.pug
+include ../../mixins/pagination.pug
+
+block main 
+    +alert-success(5000)
+    +alert-error(5000) 
+
+    // Page Header
+    section.page-header.bg-light.py-4.mb-4
+        .container
+            .row.align-items-center
+                .col-md-8
+                    h1.page-title.fw-bold.mb-2
+                        i.fas.fa-history.me-2
+                        | Lịch sử đơn hàng
+                    nav(aria-label="breadcrumb")
+                        ol.breadcrumb.mb-0
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/") Trang chủ
+                            li.breadcrumb-item.active(aria-current="page") Đơn hàng
+                .col-md-4.text-md-end
+                    if orders && orders.length > 0
+                        span.badge.bg-primary.fs-6 #{orders.length} đơn hàng
+
+    // Search Orders
+    section.search-section.py-3.mb-4
+        .container
+            .search-card.bg-white.rounded-3.shadow-sm.p-4
+                h6.fw-bold.mb-3
+                    i.fas.fa-search.me-2
+                    | Tìm kiếm đơn hàng
+                form(action="/orders/search" method="GET")
+                    .row.g-3
+                        .col-md-6
+                            label.form-label.small Loại tìm kiếm
+                            select.form-select(name="searchType" id="searchType")
+                                option(value="customer") Tìm theo thông tin khách hàng
+                                option(value="orderId") Tìm theo mã đơn hàng
+                        .col-md-6
+                            label.form-label.small Từ khóa
+                            input.form-control(
+                                type="text"
+                                name="keyword"
+                                id="keywordInput"
+                                placeholder="Nhập từ khóa tìm kiếm..."
+                            )
+                        .col-md-6
+                            label.form-label.small Từ ngày
+                            input.form-control(
+                                type="date"
+                                name="dateFrom"
+                            )
+                        .col-md-6
+                            label.form-label.small Đến ngày
+                            input.form-control(
+                                type="date"
+                                name="dateTo"
+                            )
+                        .col-12
+                            .d-flex.gap-2
+                                button.btn.btn-primary.flex-grow-1(type="submit")
+                                    i.fas.fa-search.me-2
+                                    | Tìm kiếm
+                                a.btn.btn-outline-secondary(href="/orders")
+                                    i.fas.fa-refresh.me-2
+                                    | Làm mới
+
+                // Search Tips
+                .mt-3.p-3.bg-light.rounded.small
+                    h6.fw-semibold.mb-2
+                        i.fas.fa-lightbulb.me-2.text-warning
+                        | Gợi ý tìm kiếm:
+                    .row
+                        .col-md-6
+                            ul.list-unstyled.mb-0
+                                li.mb-1
+                                    i.fas.fa-dot-circle.me-2.text-primary
+                                    | Thông tin khách hàng: tên, số điện thoại, địa chỉ
+                                li.mb-1
+                                    i.fas.fa-dot-circle.me-2.text-primary  
+                                    | Mã đơn hàng: 6 ký tự cuối hoặc mã đầy đủ
+                        .col-md-6
+                            ul.list-unstyled.mb-0
+                                li.mb-1
+                                    i.fas.fa-dot-circle.me-2.text-primary
+                                    | Có thể tìm kiếm theo khoảng thời gian
+                                li.mb-1
+                                    i.fas.fa-dot-circle.me-2.text-primary
+                                    | Kết hợp từ khóa và ngày để tìm chính xác
+
+    // Orders List
+    section.orders-section.py-4
+        .container
+            if orders && orders.length > 0
+                .orders-list
+                    each order, index in orders
+                        .order-item.bg-white.rounded-3.shadow-sm.mb-4.overflow-hidden
+                            // Order Header
+                            .order-header.bg-light.p-3.border-bottom
+                                .row.align-items-center
+                                    .col-md-8
+                                        h5.mb-1
+                                            i.fas.fa-box.me-2.text-primary
+                                            | Đơn hàng ##{order._id.toString().slice(-6).toUpperCase()}
+                                        .order-meta.small.text-muted
+                                            i.fas.fa-calendar.me-1
+                                            | Đặt ngày: #{order.createdAt.toLocaleDateString('vi-VN')}
+                                            span.mx-2 |
+                                            i.fas.fa-cube.me-1
+                                            | #{order.products.length} sản phẩm
+                                    .col-md-4.text-md-end
+                                        .order-total.mb-2
+                                            span.small.text-muted Tổng tiền: 
+                                            span.fw-bold.text-success.fs-5 #{order.totalPrice}$
+                                        a.btn.btn-outline-primary.btn-sm(href=`/orders/detail/${order._id}`)
+                                            i.fas.fa-eye.me-1
+                                            | Xem chi tiết
+
+                            // Order Products Preview
+                            .order-products.p-3
+                                .row
+                                    each product, productIndex in order.products.slice(0, 3)
+                                        .col-lg-4.col-md-6.mb-3
+                                            .product-preview.d-flex.align-items-center.p-2.rounded.bg-light
+                                                .product-image.me-3
+                                                    img.rounded(
+                                                        src=product.productInfo.thumbnail
+                                                        alt=product.productInfo.title
+                                                        style="width: 50px; height: 50px; object-fit: cover;"
+                                                    )
+                                                .product-details.flex-grow-1
+                                                    .product-name.fw-semibold.small.mb-1 #{product.productInfo.title}
+                                                    .product-quantity.text-muted.small SL: #{product.quantity}
+                                                    .product-price.text-primary.small #{product.priceNew}$
+
+                                if order.products.length > 3
+                                    .more-products.text-center.mt-3
+                                        span.small.text-muted.fst-italic
+                                            | và #{order.products.length - 3} sản phẩm khác...
+
+                // Pagination
+                if pagination.totalPage > 1
+                    .pagination-section.mt-5
+                        +pagination(pagination, "/orders")
+
+            else
+                // Empty Orders
+                .empty-orders.text-center.py-5
+                    .empty-orders-content.bg-white.rounded-3.shadow-sm.p-5.mx-auto(style="max-width: 500px;")
+                        i.fas.fa-clipboard-list.fa-4x.text-muted.mb-4
+                        h3.fw-bold.text-muted.mb-3 Chưa có đơn hàng nào
+                        p.text-muted.mb-4 Bạn chưa đặt đơn hàng nào. Hãy khám phá các sản phẩm tuyệt vời và đặt hàng ngay!
+                        a.btn.btn-primary.btn-lg(href="/products")
+                            i.fas.fa-shopping-bag.me-2
+                            | Bắt đầu mua sắm
+
+    // Custom CSS
+    style.
+        .order-item {
+            transition: all 0.3s ease;
+        }
+        
+        .order-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+        
+        .product-preview {
+            transition: all 0.3s ease;
+        }
+        
+        .product-preview:hover {
+            background-color: #e9ecef !important;
+            transform: scale(1.02);
+        }
+        
+        .search-card {
+            transition: all 0.3s ease;
+        }
+        
+        .search-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .order-header .col-md-4 {
+                text-align: center !important;
+                margin-top: 15px;
+            }
+            
+            .product-preview {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .product-preview .product-image {
+                margin-bottom: 10px;
+            }
+        }
+
+    // JavaScript for search functionality
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchTypeSelect = document.getElementById('searchType');
+            const keywordInput = document.getElementById('keywordInput');
+            
+            function updatePlaceholder() {
+                const searchType = searchTypeSelect.value;
+                if (searchType === 'orderId') {
+                    keywordInput.placeholder = 'Nhập mã đơn hàng (6 ký tự cuối hoặc đầy đủ)...';
+                } else {
+                    keywordInput.placeholder = 'Nhập tên, số điện thoại, hoặc địa chỉ...';
+                }
+            }
+            
+            searchTypeSelect.addEventListener('change', updatePlaceholder);
+            updatePlaceholder(); // Set initial placeholder
+            
+            // Form validation
+            const searchForm = searchTypeSelect.closest('form');
+            searchForm.addEventListener('submit', function(e) {
+                const keyword = keywordInput.value.trim();
+                const dateFrom = document.querySelector('input[name="dateFrom"]').value;
+                const dateTo = document.querySelector('input[name="dateTo"]').value;
+                
+                if (!keyword && !dateFrom && !dateTo) {
+                    e.preventDefault();
+                    alert('Vui lòng nhập từ khóa tìm kiếm hoặc chọn khoảng thời gian!');
+                    return false;
+                }
+                
+                // Validate date range
+                if (dateFrom && dateTo && new Date(dateFrom) > new Date(dateTo)) {
+                    e.preventDefault();
+                    alert('Ngày bắt đầu không thể lớn hơn ngày kết thúc!');
+                    return false;
+                }
+            });
+        }); 

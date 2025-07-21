@@ -1,52 +1,147 @@
 include ../mixins/sub-menu.pug
 
-header.header 
-    .container 
-        .row.align-items-center 
-            .col-3 
-                .inner-logo 
-                    a(href="/") 
-                        img(src=settingGeneral.logo, alt=settingGeneral.websiteName)
+header.header.sticky-top.shadow-sm
+    nav.navbar.navbar-expand-lg.navbar-light.bg-white.py-3
+        .container
+            // Brand section
+            .navbar-brand.me-4
+                a.text-decoration-none.d-flex.align-items-center(href="/")
+                    if settingGeneral && settingGeneral.logo
+                        img.header-logo.me-2(src=settingGeneral.logo, alt=settingGeneral.websiteName)
+                    else
+                        .brand-icon.me-2
+                            i.fas.fa-store.text-primary.fs-3
+                        .brand-text
+                            .brand-name.fw-bold.text-dark.fs-4 ShopLogo
+                            .brand-tagline.small.text-muted Chất lượng hàng đầu
 
-            .col-5
-                form(
-                    action="/search"
-                    method="GET"
-                )
-                    div(class="form-group d-flex mb-0")
-                        input(
-                            type="text"
-                            placeholder="Nhập từ khóa"
+            // Mobile toggle
+            button.navbar-toggler.border-0.shadow-none(type="button", data-bs-toggle="collapse", data-bs-target="#navbarContent")
+                i.fas.fa-bars.text-primary.fs-5
+
+            // Navigation content
+            .collapse.navbar-collapse#navbarContent
+                // Main navigation
+                ul.navbar-nav.me-auto.mb-2.mb-lg-0
+                    li.nav-item.mx-1
+                        a.nav-link.fw-semibold.px-3.py-2.rounded-pill.position-relative(href="/")
+                            i.fas.fa-home.me-2.text-primary
+                            | Trang chủ
+                            .nav-underline
+
+                    li.nav-item.dropdown.mx-1
+                        a.nav-link.dropdown-toggle.fw-semibold.px-3.py-2.rounded-pill.position-relative(
+                            href="/products"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        )
+                            i.fas.fa-box.me-2.text-success
+                            | Sản phẩm
+                            .nav-underline
+                        if layoutProductsCategory && layoutProductsCategory.length
+                            ul.dropdown-menu.border-0.shadow-lg.rounded-3.mt-2
+                                each item in layoutProductsCategory
+                                    li
+                                        a.dropdown-item.py-2.px-3.rounded-2.mx-2.mb-1(href=`/products/${item.slug}`)
+                                            i.fas.fa-tag.me-2.text-primary
+                                            | #{item.title}
+
+                    li.nav-item.dropdown.mx-1
+                        a.nav-link.dropdown-toggle.fw-semibold.px-3.py-2.rounded-pill.position-relative(
+                            href="/posts"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        )
+                            i.fas.fa-newspaper.me-2.text-info
+                            | Bài viết
+                            .nav-underline
+                        if layoutPostsCategory && layoutPostsCategory.length
+                            ul.dropdown-menu.border-0.shadow-lg.rounded-3.mt-2
+                                each item in layoutPostsCategory
+                                    li
+                                        a.dropdown-item.py-2.px-3.rounded-2.mx-2.mb-1(href=`/posts/${item.slug}`)
+                                            i.fas.fa-bookmark.me-2.text-info
+                                            | #{item.title}
+
+                    if user
+                        li.nav-item.mx-1
+                            a.nav-link.fw-semibold.px-3.py-2.rounded-pill.position-relative(href="/orders")
+                                i.fas.fa-history.me-2.text-warning
+                                | Đơn hàng
+                                .nav-underline
+
+                // Right section
+                .d-flex.align-items-center.gap-3
+                    // Search bar
+                    .search-wrapper.d-none.d-lg-block
+                        form.search-form.position-relative(action="/search", method="GET")
+                            input.form-control.search-input.border-0.bg-light.rounded-pill.pe-5(
+                                type="search"
+                                placeholder="Tìm kiếm sản phẩm..."
+                                name="keyword"
+                                value=keyword
+                                style="min-width: 280px; padding: 0.75rem 1.25rem;"
+                            )
+                            button.btn.search-btn.position-absolute.top-50.end-0.translate-middle-y.me-2.rounded-circle.border-0(type="submit")
+                                i.fas.fa-search.text-white.align-center.justify-content-center.d-flex
+
+                    // Cart button
+                    a.cart-link.position-relative.text-decoration-none.me-2(href="/cart")
+                        .cart-button.d-flex.align-items-center.bg-light.rounded-pill.px-3.py-2.transition-all
+                            i.fas.fa-shopping-cart.text-warning.fs-5.me-2
+                            span.d-none.d-md-inline.fw-semibold.text-dark Giỏ hàng
+                            if miniCart && miniCart.totalQuantity > 0
+                                .cart-badge.position-absolute.top-0.start-100.translate-middle.bg-danger.text-white.rounded-circle.d-flex.align-items-center.justify-content-center
+                                    | #{miniCart.totalQuantity}
+
+                    // User section
+                    if user
+                        .dropdown
+                            a.user-menu.dropdown-toggle.text-decoration-none.d-flex.align-items-center.bg-light.rounded-pill.px-3.py-2.transition-all(
+                                href="#"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            )
+                                .user-avatar.me-2
+                                    i.fas.fa-user-circle.text-primary.fs-4
+                                span.fw-semibold.text-dark.d-none.d-lg-inline #{user.fullName}
+                            ul.dropdown-menu.dropdown-menu-end.border-0.shadow-lg.rounded-3.mt-2.p-2
+                                li
+                                    a.dropdown-item.py-2.px-3.rounded-2.mb-1(href="/user/info")
+                                        i.fas.fa-user.me-2.text-primary
+                                        | Thông tin cá nhân
+                                li
+                                    a.dropdown-item.py-2.px-3.rounded-2.mb-1(href="/orders")
+                                        i.fas.fa-list-alt.me-2.text-success
+                                        | Đơn hàng của tôi
+                                li
+                                    hr.dropdown-divider.my-2
+                                li
+                                    a.dropdown-item.py-2.px-3.rounded-2.text-danger(href="/user/logout")
+                                        i.fas.fa-sign-out-alt.me-2
+                                        | Đăng xuất
+                    else
+                        .auth-buttons.d-flex.gap-2
+                            a.btn.btn-outline-primary.rounded-pill.px-4.fw-semibold(href="/user/login")
+                                i.fas.fa-sign-in-alt.me-1
+                                | Đăng nhập
+                            a.btn.btn-primary.rounded-pill.px-4.fw-semibold.shadow-sm(href="/user/register")
+                                i.fas.fa-user-plus.me-1
+                                | Đăng ký
+
+            // Mobile content
+            .mobile-content.d-lg-none.mt-4.pt-3.border-top
+                // Mobile search
+                form.mobile-search.mb-3(action="/search", method="GET")
+                    .input-group
+                        input.form-control.border-0.bg-light.rounded-start-pill(
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm..."
                             name="keyword"
-                            class="form-control"
                             value=keyword
                         )
-                        button(
-                            class="btn btn-primary"
-                            type="submit"
-                        ) Tìm
-            .col-4 
-                .inner-menu 
-                    ul 
-                        li 
-                            a(href="/") Trang chủ   
-                        li(class="sub-menu")
-                            -const pathProduct = "/products"
-                            a(href=pathProduct) Sản phẩm
-                                +sub-menu(layoutProductsCategory, pathProduct)
-                        li(class="sub-menu")
-                            -const pathPost = "/posts"
-                            a(href=pathPost) Bài viết
-                                +sub-menu(layoutPostsCategory, pathPost)
-                        li 
-                            a(href="/cart") Giỏ hàng (#{miniCart ? miniCart.totalQuantity : 0})
-                        if(user)
-                            li 
-                                a(href="/user/info") #{user.fullName}
-                            li 
-                                a(href="/user/logout") Đăng xuấtx
-                        else 
-                            li 
-                                a(href="/user/login") Đăng nhập
-                            li 
-                                a(href="/user/register") Đăng ký
+                        button.btn.btn-primary.rounded-end-pill(type="submit")
+                            i.fas.fa-search

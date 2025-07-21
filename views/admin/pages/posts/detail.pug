@@ -1,34 +1,615 @@
 extends ../../layouts/default.pug
+include ../../mixins/alert.pug
 
-block main 
-    if (post.title)
-        h1(class="mb-4") #{post.title}
+block main
+    +alert-success(5000)
 
-    if (post.thumbnail)
-        div(class="mb-4") 
-            img(
-                src=post.thumbnail
-                style="width= 100px"
-            )
+    .post-detail-container
+        // Header Section
+        .page-header
+            .header-content
+                .header-info
+                    .breadcrumb-nav.mb-2
+                        a.breadcrumb-link(href=`${prefixAdmin}/posts`)
+                            i.fas.fa-arrow-left.me-2
+                            span Quay lại danh sách
+                        .breadcrumb-separator /
+                        span.breadcrumb-current Chi tiết bài viết
+                    
+                    .page-title-group
+                        h1.page-title
+                            i.fas.fa-newspaper.me-3
+                            span #{post.title || 'Không có tiêu đề'}
+                        if(post.post_category_id && post.category)
+                            .category-badge.mt-2
+                                i.fas.fa-folder.me-1
+                                span Danh mục: #{post.category.title}
 
-    if (post.description)
-        div(class="mb-4") !{post.description}
+                .header-actions
+                    a.btn-primary(href=`${prefixAdmin}/posts/edit/${post.id}`)
+                        i.fas.fa-edit.me-2
+                        span Chỉnh sửa
+                    if(post.status == "active")
+                        a.btn-info(href="#" target="_blank")
+                            i.fas.fa-external-link-alt.me-2
+                            span Xem trực tiếp
 
-    if (post.status)
-        div(class="mb-4") 
-            span Trạng thái: 
-            if (post.status === "active")
-                span(class="badge badge-success") Hoạt động
-            else 
-                span(class="badge badge-danger") Dừng hoạt động
+        // Main Content
+        .detail-content
+            .content-grid
+                // Left Column - Image & Meta Information
+                .detail-sidebar
+                    // Image Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-image.me-2
+                                span Ảnh minh họa
+                        
+                        .card-content
+                            .image-container
+                                if (post.thumbnail)
+                                    .post-thumbnail
+                                        img.thumbnail-image(
+                                            src=post.thumbnail
+                                            alt=post.title
+                                            onerror="this.src='/images/150x150.svg'"
+                                        )
+                                        .image-overlay
+                                            .overlay-content
+                                                i.fas.fa-search-plus
+                                                span Xem lớn
+                                else
+                                    .no-image-placeholder
+                                        i.fas.fa-image.placeholder-icon
+                                        .placeholder-text Chưa có ảnh minh họa
+                                        .placeholder-subtext Bài viết chưa được thêm ảnh
 
-    if (post.position)
-        div(class="mb-4") Vị trí: <b>#{post.position}</b>
+                    // Meta Information Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin chi tiết
+                        
+                        .card-content
+                            .meta-grid
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-fingerprint.me-2
+                                        span ID bài viết
+                                    .meta-value.text-primary #{post.id}
 
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-toggle-on.me-2
+                                        span Trạng thái
+                                    .meta-value
+                                        if(post.status == "active")
+                                            .status-badge.status-active
+                                                i.fas.fa-check-circle.me-1
+                                                span Đã xuất bản
+                                        else
+                                            .status-badge.status-inactive
+                                                i.fas.fa-clock.me-1
+                                                span Bản nháp
 
-    a(
-        href=`${prefixAdmin}/posts/edit/${post.id}`
-        class="btn btn-warning"       
-    ) Chỉnh sửa
+                                if (post.position)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-sort-numeric-down.me-2
+                                            span Vị trí hiển thị
+                                        .meta-value #{post.position}
+
+                                if(post.createdAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-plus.me-2
+                                            span Ngày tạo
+                                        .meta-value #{new Date(post.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                                if(post.updatedAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-edit.me-2
+                                            span Cập nhật lần cuối
+                                        .meta-value #{new Date(post.updatedAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                // Right Column - Content
+                .detail-main
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-align-left.me-2
+                                span Nội dung bài viết
+                        
+                        .card-content
+                            .content-area
+                                if (post.description)
+                                    .post-content !{post.description}
+                                else
+                                    .no-content-placeholder
+                                        i.fas.fa-file-alt.placeholder-icon
+                                        .placeholder-text Chưa có nội dung
+                                        .placeholder-subtext Bài viết chưa được viết nội dung
+
+            // Action Section
+            .action-section
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-cogs.me-2
+                            span Thao tác quản lý
+                    
+                    .card-content
+                        .action-buttons
+                            a.btn-primary(href=`${prefixAdmin}/posts/edit/${post.id}`)
+                                i.fas.fa-edit.me-2
+                                span Chỉnh sửa bài viết
+                            
+                            a.btn-secondary(href=`${prefixAdmin}/posts`)
+                                i.fas.fa-list.me-2
+                                span Danh sách bài viết
+                            
+                            if(post.post_category_id)
+                                a.btn-info(href=`${prefixAdmin}/posts-category/detail/${post.post_category_id}`)
+                                    i.fas.fa-folder.me-2
+                                    span Xem danh mục
+                            
+                            if(post.status == "active")
+                                a.btn-success(href="#" target="_blank")
+                                    i.fas.fa-external-link-alt.me-2
+                                    span Xem trực tiếp
+                            
+                            if(role.permissions && role.permissions.includes("posts_delete"))
+                                button.btn-danger(
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                )
+                                    i.fas.fa-trash-alt.me-2
+                                    span Xóa bài viết
+
+    // Delete Confirmation Modal
+    if(role.permissions && role.permissions.includes("posts_delete"))
+        .modal.fade#deleteModal(tabindex="-1")
+            .modal-dialog.modal-dialog-centered
+                .modal-content
+                    .modal-header.border-0
+                        h5.modal-title.text-danger
+                            i.fas.fa-exclamation-triangle.me-2
+                            | Xác nhận xóa bài viết
+                        button.btn-close(type="button" data-bs-dismiss="modal")
+                    .modal-body.text-center.py-4
+                        .delete-icon.mb-3
+                            i.fas.fa-trash-alt.fa-3x.text-danger.opacity-50
+                        p.mb-3.h6 Bạn có chắc chắn muốn xóa bài viết này?
+                        .alert.alert-warning.text-start
+                            strong #{post.title}
+                        p.text-muted.small Hành động này không thể hoàn tác
+                    .modal-footer.border-0.justify-content-center
+                        button.btn.btn-secondary.px-4(type="button" data-bs-dismiss="modal") Hủy bỏ
+                        a.btn.btn-danger.px-4(href=`${prefixAdmin}/posts/delete/${post.id}`) Xóa bài viết
+
+    style.
+        .post-detail-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: #6c757d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #adb5bd;
+        }
+
+        .breadcrumb-current {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .page-title i {
+            color: #3498db;
+            font-size: 28px;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-danger {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .detail-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #3498db;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .post-thumbnail {
+            position: relative;
+            display: inline-block;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-thumbnail:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .post-thumbnail:hover .thumbnail-image {
+            transform: scale(1.05);
+        }
+
+        .overlay-content {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .overlay-content i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-image-placeholder, .no-content-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .content-area {
+            line-height: 1.8;
+        }
+
+        .post-content {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .post-content h1, .post-content h2, .post-content h3,
+        .post-content h4, .post-content h5, .post-content h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .post-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .action-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .delete-icon {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-sidebar {
+                order: 2;
+            }
+
+            .detail-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .post-detail-container {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-actions {
+                align-self: stretch;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn-primary,
+            .header-actions .btn-info {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn-primary,
+            .action-buttons .btn-secondary,
+            .action-buttons .btn-info,
+            .action-buttons .btn-success,
+            .action-buttons .btn-danger {
+                justify-content: center;
+            }
+        }
 
     script(src="/admin/js/product.js") 
