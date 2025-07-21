@@ -1,17 +1,64 @@
-mixin alert-success(time)
-    - if (messages.success)
-        .message.info 
-            div(
-                class="alert alert-success"
-                show-alert
-                data-time=time 
-            ) #{messages.success} <span close-alert>x</span>
+//- Modern Client Alert Mixins - Bootstrap 5 Compatible
+mixin alert-success(time = 5000)
+    if messages.success
+        .alert.alert-success.alert-dismissible.client-alert(
+            role="alert"
+            show-alert
+            data-time=time
+        )
+            .alert-content
+                i.fas.fa-check-circle.alert-icon
+                span.alert-message #{messages.success}
+            button.btn-close.client-close(
+                type="button"
+                close-alert
+                aria-label="Close"
+            )
 
-mixin alert-error(time)
-    - if (messages.error)
-        .message.info 
-            div(
-                class="alert alert-danger"
-                show-alert
-                data-time=time 
-            ) #{messages.error} <span close-alert>x</span>
+mixin alert-error(time = 5000)
+    if messages.error
+        .alert.alert-danger.alert-dismissible.client-alert(
+            role="alert"
+            show-alert
+            data-time=time
+        )
+            .alert-content
+                i.fas.fa-exclamation-circle.alert-icon
+                span.alert-message #{messages.error}
+            button.btn-close.client-close(
+                type="button"
+                close-alert
+                aria-label="Close"
+            )
+
+mixin alert-warning(time = 5000)
+    if messages.warning
+        .alert.alert-warning.alert-dismissible.client-alert(
+            role="alert"
+            show-alert
+            data-time=time
+        )
+            .alert-content
+                i.fas.fa-exclamation-triangle.alert-icon
+                span.alert-message #{messages.warning}
+            button.btn-close.client-close(
+                type="button"
+                close-alert
+                aria-label="Close"
+            )
+
+mixin alert-info(time = 5000)
+    if messages.info
+        .alert.alert-info.alert-dismissible.client-alert(
+            role="alert"
+            show-alert
+            data-time=time
+        )
+            .alert-content
+                i.fas.fa-info-circle.alert-icon
+                span.alert-message #{messages.info}
+            button.btn-close.client-close(
+                type="button"
+                close-alert
+                aria-label="Close"
+            )

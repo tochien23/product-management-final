@@ -1,98 +1,533 @@
-extend ../../layouts/default.pug
+extends ../../layouts/default.pug
 include ../../mixins/alert.pug
 
 block main
     if(role.permissions.includes("accounts_create"))
-        h1(class="mb-4") Thêm mới tài khoản
+        .account-create-container
+            // Header Section
+            .page-header
+                .header-content
+                    h1.page-title
+                        i.fas.fa-user-plus
+                        span Thêm mới tài khoản
+                    .header-actions
+                        a.btn-secondary(href=`${prefixAdmin}/accounts`)
+                            i.fas.fa-arrow-left
+                            span Quay lại danh sách
 
         +alert-error(5000)
 
-        form(
-            action=`${prefixAdmin}/accounts/create`
-            method="POST"
-            enctype="multipart/form-data"
-        )
-            div(class="form-group")
-                label(for="fullName") Họ tên *
-                input(
-                    type="text"
-                    class="form-control"
-                    id="fullName"
-                    name="fullName"
-                    required 
-                )
-            div(class="form-group")
-                label(for="email") Email *
-                input(
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    required
-                )
-            div(class="form-group")
-                label(for="password") Mật khẩu *
-                input(
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    required
-                )
-            div(class="form-group")
-                label(for="phone") Số điện thoại
-                input(
-                    type="text"
-                    class="form-control"
-                    id="phone"
-                    name="phone"
-                )
-            div(
-                class="form-group"
-                upload-image    
+        // Form Container
+        .form-container
+            form.account-form(
+                action=`${prefixAdmin}/accounts/create`
+                method="POST"
+                enctype="multipart/form-data"
             )
-                label(for="avatar") Avatar
-                input(
-                    type="file"
-                    class="form-control-file"
-                    id="avatar"
-                    name="avatar"
-                    accept="image/*"
-                    upload-image-input
-                )
-                img(
-                    src=""
-                    class="image-preview"
-                    upload-image-preview
-                )
-            div(class="form-group")
-                label(for="role_id") Phân quyền 
-                select(name="role_id" id="role_id" class="form-control") 
-                    option(disabled) -- Chọn -- 
-                    each item in roles
-                        option(value=item.id) #{item.title} 
-            div(class="form-group form-check form-check-inline")
-                input(
-                    type="radio"
-                    class="form-check-input"
-                    id="statusActive"
-                    name="status"
-                    value="active"
-                    checked 
-                )
-                label(for="statusActive" class="form-check-label") Hoạt động
-            div(class="form-group form-check form-check-inline")
-                input(
-                    type="radio"
-                    class="form-check-input"
-                    id="statusInActive"
-                    name="status"
-                    value="inactive"
-                )
-                label(for="statusInActive" class="form-check-label") Dừng hoạt động 
+                .form-sections
+                    // Basic Information Section
+                    .form-section
+                        .section-header
+                            h3.section-title
+                                i.fas.fa-user
+                                span Thông tin cơ bản
+                        
+                        .section-content
+                            .form-grid
+                                .form-group
+                                    label.form-label(for="fullName")
+                                        i.fas.fa-user-circle
+                                        span Họ và tên
+                                        span.required *
+                                    input.form-control(
+                                        type="text"
+                                        id="fullName"
+                                        name="fullName"
+                                        placeholder="Nhập họ và tên đầy đủ"
+                                        required 
+                                    )
+                                
+                                .form-group
+                                    label.form-label(for="email")
+                                        i.fas.fa-envelope
+                                        span Email
+                                        span.required *
+                                    input.form-control(
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        placeholder="example@domain.com"
+                                        required
+                                    )
+                                
+                                .form-group
+                                    label.form-label(for="phone")
+                                        i.fas.fa-phone
+                                        span Số điện thoại
+                                    input.form-control(
+                                        type="text"
+                                        id="phone"
+                                        name="phone"
+                                        placeholder="Nhập số điện thoại"
+                                    )
 
-            div(class="form-group")
-                button(
-                    type="submit"
-                    class="btn btn-primary"
-                ) Tạo mới
+                    // Security Section
+                    .form-section
+                        .section-header
+                            h3.section-title
+                                i.fas.fa-shield-alt
+                                span Bảo mật & Phân quyền
+                        
+                        .section-content
+                            .form-grid
+                                .form-group
+                                    label.form-label(for="password")
+                                        i.fas.fa-lock
+                                        span Mật khẩu
+                                        span.required *
+                                    input.form-control(
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Nhập mật khẩu mạnh"
+                                        required
+                                    )
+                                    .form-help
+                                        i.fas.fa-info-circle
+                                        span Mật khẩu nên có ít nhất 8 ký tự
+                                
+                                .form-group
+                                    label.form-label(for="role_id")
+                                        i.fas.fa-user-tag
+                                        span Nhóm quyền
+                                        span.required *
+                                    select.form-control(name="role_id" id="role_id" required)
+                                        option(value="" disabled selected) -- Chọn nhóm quyền --
+                                        each item in roles
+                                            option(value=item.id) #{item.title}
+
+                    // Avatar Section
+                    .form-section
+                        .section-header
+                            h3.section-title
+                                i.fas.fa-image
+                                span Ảnh đại diện
+                        
+                        .section-content
+                            .upload-container(upload-image)
+                                .upload-area
+                                    .upload-placeholder
+                                        i.fas.fa-cloud-upload-alt
+                                        .upload-text Chọn ảnh đại diện
+                                        .upload-subtext Định dạng: JPG, PNG (Tối đa 2MB)
+                                    input.upload-input(
+                                        type="file"
+                                        class="form-control-file"
+                                        id="avatar"
+                                        name="avatar"
+                                        accept="image/*"
+                                        upload-image-input
+                                    )
+                                .preview-container
+                                    img.image-preview(
+                                        src=""
+                                        class="image-preview"
+                                        upload-image-preview
+                                    )
+
+                    // Status Section
+                    .form-section
+                        .section-header
+                            h3.section-title
+                                i.fas.fa-toggle-on
+                                span Trạng thái hoạt động
+                        
+                        .section-content
+                            .status-options
+                                .status-option
+                                    input.status-radio(
+                                        type="radio"
+                                        id="statusActive"
+                                        name="status"
+                                        value="active"
+                                        checked 
+                                    )
+                                    label.status-label(for="statusActive")
+                                        .status-indicator.active
+                                        .status-text
+                                            .status-title Hoạt động
+                                            .status-desc Tài khoản có thể đăng nhập và sử dụng
+                                
+                                .status-option
+                                    input.status-radio(
+                                        type="radio"
+                                        id="statusInActive"
+                                        name="status"
+                                        value="inactive"
+                                    )
+                                    label.status-label(for="statusInActive")
+                                        .status-indicator.inactive
+                                        .status-text
+                                            .status-title Tạm khóa
+                                            .status-desc Tài khoản bị khóa, không thể đăng nhập
+
+                // Action Section
+                .form-actions
+                    .action-buttons
+                        button.btn-primary(type="submit")
+                            i.fas.fa-save
+                            span Tạo tài khoản
+                        
+                        a.btn-secondary(href=`${prefixAdmin}/accounts`)
+                            i.fas.fa-times
+                            span Hủy bỏ
+
+        style.
+            .account-create-container {
+                padding: 20px;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            .page-header {
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .header-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .page-title {
+                font-size: 28px;
+                font-weight: 600;
+                color: #2c3e50;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .page-title i {
+                color: #3498db;
+            }
+
+            .header-actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 12px 24px;
+                border-radius: 6px;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary {
+                background: #27ae60;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: #229954;
+                text-decoration: none;
+                color: white;
+            }
+
+            .btn-secondary {
+                background: #95a5a6;
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: #7f8c8d;
+                text-decoration: none;
+                color: white;
+            }
+
+            .form-container {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+
+            .form-sections {
+                padding: 30px;
+            }
+
+            .form-section {
+                margin-bottom: 40px;
+            }
+
+            .form-section:last-child {
+                margin-bottom: 0;
+            }
+
+            .section-header {
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid #f8f9fa;
+            }
+
+            .section-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #2c3e50;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .section-title i {
+                color: #3498db;
+                width: 20px;
+            }
+
+            .section-content {
+                padding-top: 10px;
+            }
+
+            .form-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: #495057;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-label i {
+                color: #6c757d;
+                width: 16px;
+            }
+
+            .required {
+                color: #e74c3c;
+                font-weight: 600;
+            }
+
+            .form-control {
+                padding: 12px 16px;
+                border: 2px solid #e9ecef;
+                border-radius: 6px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                background: #fff;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #3498db;
+                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            }
+
+            .form-control::placeholder {
+                color: #adb5bd;
+            }
+
+            .form-help {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                color: #6c757d;
+                font-size: 12px;
+            }
+
+            .form-help i {
+                color: #17a2b8;
+            }
+
+            .upload-container {
+                position: relative;
+            }
+
+            .upload-area {
+                border: 2px dashed #e9ecef;
+                border-radius: 8px;
+                padding: 40px 20px;
+                text-align: center;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                background: #f8f9fa;
+            }
+
+            .upload-area:hover {
+                border-color: #3498db;
+                background: #ebf3ff;
+            }
+
+            .upload-placeholder {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .upload-placeholder i {
+                font-size: 48px;
+                color: #adb5bd;
+            }
+
+            .upload-text {
+                font-weight: 500;
+                color: #495057;
+            }
+
+            .upload-subtext {
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+            .upload-input {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .preview-container {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .image-preview {
+                max-width: 200px;
+                max-height: 200px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .status-options {
+                display: flex;
+                gap: 20px;
+            }
+
+            .status-option {
+                flex: 1;
+            }
+
+            .status-radio {
+                display: none;
+            }
+
+            .status-label {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                background: #fff;
+            }
+
+            .status-label:hover {
+                border-color: #3498db;
+                background: #ebf3ff;
+            }
+
+            .status-radio:checked + .status-label {
+                border-color: #3498db;
+                background: #ebf3ff;
+            }
+
+            .status-indicator {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            .status-indicator.active {
+                background: #27ae60;
+            }
+
+            .status-indicator.inactive {
+                background: #e74c3c;
+            }
+
+            .status-text {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .status-title {
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .status-desc {
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+            .form-actions {
+                padding: 20px 30px;
+                background: #f8f9fa;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 12px;
+                justify-content: flex-end;
+            }
+
+            @media (max-width: 768px) {
+                .account-create-container {
+                    padding: 15px;
+                }
+                
+                .header-content {
+                    flex-direction: column;
+                    gap: 15px;
+                    align-items: flex-start;
+                }
+                
+                .form-sections {
+                    padding: 20px;
+                }
+                
+                .status-options {
+                    flex-direction: column;
+                }
+                
+                .action-buttons {
+                    flex-direction: column;
+                }
+                
+                .page-title {
+                    font-size: 24px;
+                }
+            }
+
+        script(src="/admin/js/script.js")

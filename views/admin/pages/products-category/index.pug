@@ -3,37 +3,45 @@ include ../../mixins/table-tree.pug
 
 block main
     if(role.permissions.includes("products-category_view"))
-        h1 Danh mục sản phẩm
+        // Header
+        .d-flex.justify-content-between.align-items-center.mb-4
+            h2.fw-bold.text-dark.mb-0 Danh mục sản phẩm
+            if(role.permissions.includes("products-category_create"))
+                a.btn.btn-primary.px-4(href=`${prefixAdmin}/products-category/create`)
+                    i.fas.fa-plus.me-2
+                    | Thêm mới
 
-        .card-mb-3
-            .card-header Danh sách
-                .card-body
-                    .row 
-                        .col-8 
-                        .col-4 
-                            if(role.permissions.includes("products-category_create"))
-                                a(
-                                    href=`${prefixAdmin}/products-category/create`
-                                    class="btn btn-outline-success"
-                                ) + Thêm mới
+        // Products Category Table
+        .bg-white.rounded-3.shadow-sm.overflow-hidden
+            .table-responsive
+                table.table.table-hover.mb-0.admin-table(checkbox-multi)
+                    thead
+                        tr
+                            th.py-4.px-4.border-0.text-center(width="60" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                .custom-control.custom-checkbox
+                                    input.custom-control-input.form-check-input(type="checkbox" name="checkall" id="checkall")
+                                    label.custom-control-label(for="checkall")
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="70" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-hashtag.me-1
+                                | STT
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-image.me-1
+                                | Hình ảnh
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="200" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-folder.me-1
+                                | Tên danh mục
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-sort-numeric-down.me-1
+                                | Vị trí
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="130" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-toggle-on.me-1
+                                | Trạng thái
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="180" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-cogs.me-1
+                                | Thao tác
 
-                    table(
-                        class="table table-hover table-sm"
-                        checkbox-multi
-                    )
-                        thead 
-                            tr 
-                                th  
-                                    input(type="checkbox" name="checkall")
-                                th STT 
-                                th Hình ảnh 
-                                th Tiêu đề
-                                th Vị trí
-                                th Trạng thái 
-                                th Hành động
-
-                        tbody 
-                            +table-tree(records)
+                    tbody
+                        +table-tree(records)
 
     form(
         action=""

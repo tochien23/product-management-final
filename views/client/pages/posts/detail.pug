@@ -3,28 +3,274 @@ include ../../mixins/box-head.pug
 include ../../mixins/moment.pug
 
 block main 
-    .post-detail 
-        .container.my-5
-            .row
-                .col-6 
-                    .inner-thumb
-                        img(src=post.thumbnail, alt=post.title)
-                .col-6
-                    h1(class="inner-title") #{post.title}
+    // Breadcrumb Section
+    .bg-light.py-3.border-bottom
+        .container
+            nav(aria-label="breadcrumb")
+                ol.breadcrumb.mb-0
+                    li.breadcrumb-item
+                        a.text-decoration-none(href="/")
+                            i.fas.fa-home.me-1
+                            | Trang chủ
+                    li.breadcrumb-item
+                        a.text-decoration-none(href="/posts")
+                            i.fas.fa-blog.me-1
+                            | Blog
+                    li.breadcrumb-item.active(aria-current="page")
+                        | #{post.title.substring(0, 50)}...
 
-                    if (post.category)
-                        div(class="inner-category") 
-                            span Danh mục: 
-                            a(href=`/posts/${post.category.slug}`) #{post.category.title}
-                    div(class="inner-created")
-                        span Ngày tạo:
-                        span 
-                            +formatDateTimeAgo(post.createdBy.createdAt)
+    // Post Hero Section
+    .post-hero.position-relative
+        if post.thumbnail
+            .hero-image.position-relative
+                img.w-100(
+                    src=post.thumbnail
+                    alt=post.title
+                    style="height: 400px; object-fit: cover;"
+                )
+                .hero-overlay.position-absolute.top-0.start-0.w-100.h-100.d-flex.align-items-end
+                    .container
+                        .row
+                            .col-lg-8
+                                .hero-content.text-white.p-4
+                                    if post.post_category_id && post.post_category_id.title
+                                        .badge.bg-primary.mb-3.px-3.py-2
+                                            i.fas.fa-tag.me-1
+                                            | #{post.post_category_id.title}
+                                    h1.display-5.fw-bold.mb-3.text-shadow #{post.title}
+                                    .post-meta.d-flex.align-items-center.flex-wrap.gap-3
+                                        .meta-item
+                                            i.fas.fa-calendar-alt.me-1
+                                            +formatDateTime(post.createdAt)
+                                        if post.author
+                                            .meta-item
+                                                i.fas.fa-user.me-1
+                                                | #{post.author}
+                                        .meta-item
+                                            i.fas.fa-eye.me-1
+                                            | #{post.views || 0} lượt xem
+        else
+            .hero-fallback.bg-primary.text-white.py-5
+                .container
+                    .row
+                        .col-lg-8.mx-auto.text-center
+                            if post.post_category_id && post.post_category_id.title
+                                .badge.bg-light.text-primary.mb-3.px-3.py-2
+                                    i.fas.fa-tag.me-1
+                                    | #{post.post_category_id.title}
+                            h1.display-5.fw-bold.mb-3 #{post.title}
+                            .post-meta.d-flex.align-items-center.justify-content-center.flex-wrap.gap-3
+                                .meta-item
+                                    i.fas.fa-calendar-alt.me-1
+                                    +formatDateTime(post.createdAt)
+                                if post.author
+                                    .meta-item
+                                        i.fas.fa-user.me-1
+                                        | #{post.author}
+                                .meta-item
+                                    i.fas.fa-eye.me-1
+                                    | #{post.views || 0} lượt xem
 
-        hr
+    // Main Content
+    .container.my-5
+        .row
+            // Post Content
+            .col-lg-8
+                article.post-content
+                    // Post Actions
+                    .post-actions.d-flex.justify-content-between.align-items-center.mb-4.p-3.bg-light.rounded
+                        .social-share.d-flex.align-items-center.gap-2
+                            span.text-muted.me-2
+                                i.fas.fa-share-alt.me-1
+                                | Chia sẻ:
+                            a.btn.btn-sm.btn-outline-primary(href="#" title="Chia sẻ Facebook")
+                                i.fab.fa-facebook-f
+                            a.btn.btn-sm.btn-outline-info(href="#" title="Chia sẻ Twitter")
+                                i.fab.fa-twitter
+                            a.btn.btn-sm.btn-outline-success(href="#" title="Chia sẻ WhatsApp")
+                                i.fab.fa-whatsapp
+                            a.btn.btn-sm.btn-outline-secondary(href="#" title="Copy link")
+                                i.fas.fa-link
 
-        .container.my-5
-            .row 
-                .col-12 
-                    +box-head("Mô tả bài viết")
-                    .inner-desc !{post.description}
+                        .post-utils.d-flex.align-items-center.gap-2
+                            button.btn.btn-sm.btn-outline-danger(title="Yêu thích")
+                                i.fas.fa-heart.me-1
+                                | Yêu thích
+
+                    // Post Content Body
+                    .post-body.bg-white.p-4.rounded.shadow-sm
+                        if post.description
+                            .content-prose
+                                != post.description
+                        else
+                            .text-muted.text-center.py-5
+                                i.fas.fa-file-alt.fa-3x.mb-3.d-block
+                                | Nội dung bài viết đang được cập nhật...
+
+                    // Post Tags
+                    if post.tags && post.tags.length > 0
+                        .post-tags.mt-4
+                            h6.fw-bold.text-dark.mb-3
+                                i.fas.fa-tags.me-1
+                                | Tags:
+                            .d-flex.flex-wrap.gap-2
+                                each tag in post.tags
+                                    .badge.bg-light.text-dark.px-3.py-2
+                                        | ##{tag}
+
+                    // Post Navigation
+                    .post-navigation.mt-5.pt-4.border-top
+                        .row
+                            .col-md-6.mb-3.mb-md-0
+                                if prevPost
+                                    .nav-item.text-start
+                                        .small.text-muted.mb-1
+                                            i.fas.fa-arrow-left.me-1
+                                            | Bài trước
+                                        a.text-decoration-none.fw-medium(href=`/posts/${prevPost.slug}`)
+                                            | #{prevPost.title}
+                            .col-md-6
+                                if nextPost
+                                    .nav-item.text-end
+                                        .small.text-muted.mb-1
+                                            | Bài tiếp theo
+                                            i.fas.fa-arrow-right.ms-1
+                                        a.text-decoration-none.fw-medium(href=`/posts/${nextPost.slug}`)
+                                            | #{nextPost.title}
+
+            // Sidebar
+            .col-lg-4
+                .sidebar.position-sticky(style="top: 20px;")
+                    // Post Info Card
+                    .card.mb-4.border-0.shadow-sm
+                        .card-header.bg-primary.text-white
+                            h6.mb-0.fw-bold
+                                i.fas.fa-info-circle.me-1
+                                | Thông tin bài viết
+                        .card-body
+                            .post-info-list
+                                .info-item.d-flex.justify-content-between.py-2.border-bottom
+                                    span.text-muted Danh mục:
+                                    if post.post_category_id && post.post_category_id.title
+                                        a.text-decoration-none(href=`/posts/category/${post.post_category_id.slug}`)
+                                            | #{post.post_category_id.title}
+                                    else
+                                        span.text-muted Chưa phân loại
+                                .info-item.d-flex.justify-content-between.py-2.border-bottom
+                                    span.text-muted Ngày đăng:
+                                    span 
+                                        +formatDateTime(post.createdAt)
+                                if post.author
+                                    .info-item.d-flex.justify-content-between.py-2.border-bottom
+                                        span.text-muted Tác giả:
+                                        span #{post.author}
+                                .info-item.d-flex.justify-content-between.py-2
+                                    span.text-muted Lượt xem:
+                                    span.fw-bold #{post.views || 0}
+
+                    // Related Posts
+                    if relatedPosts && relatedPosts.length > 0
+                        .card.mb-4.border-0.shadow-sm
+                            .card-header.bg-success.text-white
+                                h6.mb-0.fw-bold
+                                    i.fas.fa-newspaper.me-1
+                                    | Bài viết liên quan
+                            .card-body.p-0
+                                each relatedPost in relatedPosts.slice(0, 4)
+                                    .related-post.p-3.border-bottom
+                                        .d-flex
+                                            if relatedPost.thumbnail
+                                                .related-thumb.me-3
+                                                    img.rounded(
+                                                        src=relatedPost.thumbnail
+                                                        alt=relatedPost.title
+                                                        style="width: 60px; height: 60px; object-fit: cover;"
+                                                    )
+                                            else
+                                                .related-thumb.me-3.bg-light.rounded.d-flex.align-items-center.justify-content-center(style="width: 60px; height: 60px;")
+                                                    i.fas.fa-file-alt.text-muted
+                                            .related-content.flex-grow-1
+                                                h6.mb-1
+                                                    a.text-decoration-none.text-dark(href=`/posts/${relatedPost.slug}`)
+                                                        | #{relatedPost.title.substring(0, 60)}...
+                                                .small.text-muted
+                                                    i.fas.fa-calendar-alt.me-1
+                                                    +formatDateTime(relatedPost.createdAt)
+
+                    // Back to Posts
+                    .card.border-0.shadow-sm
+                        .card-body.text-center
+                            a.btn.btn-outline-primary.btn-lg.w-100(href="/posts")
+                                i.fas.fa-arrow-left.me-2
+                                | Về danh sách bài viết
+
+    // Custom Styles
+    style.
+        .hero-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+        }
+        
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .meta-item {
+            font-size: 0.9rem;
+        }
+        
+        .content-prose {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .content-prose h1, .content-prose h2, .content-prose h3 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content-prose p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-prose img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .related-post:last-child {
+            border-bottom: none !important;
+        }
+        
+        .related-post:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .social-share a:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-image img {
+                height: 250px !important;
+            }
+            
+            .hero-content {
+                padding: 2rem 1rem !important;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .social-share, .post-utils {
+                justify-content: center;
+            }
+            
+            .sidebar {
+                margin-top: 2rem;
+            }
+        }

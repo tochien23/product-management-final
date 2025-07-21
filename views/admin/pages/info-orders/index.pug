@@ -11,121 +11,150 @@ block main
     if(role.permissions.includes("orders_view"))
         +alert-success(5000)
         
-        h1 Danh sách đơn hàng
+        // Header
+        .d-flex.justify-content-between.align-items-center.mb-4
+            h2.fw-bold.text-dark.mb-0 Quản lý đơn hàng khách hàng
+            .d-flex.gap-2
+                span.badge.bg-primary.fs-6.px-3.py-2
+                    i.fas.fa-shopping-cart.me-1
+                    | #{orders ? orders.length : 0} đơn hàng
 
-        .card-mb-3
-            .card-header Bộ lọc và Tìm kiếm
-            .card-body
-            .row 
-                .col-6
-                    +filter-status(filterStatus)
-                .col-6 
+        // Filter Section
+        .row.g-3.mb-4
+            .col-md-6
+                .bg-white.p-3.rounded.border
+                    label.form-label.fw-semibold.mb-2 Tìm kiếm
                     +search(keyword)
-        .card-mb-3
-            .card-header Danh sách
-                .card-body
-                    .row 
-                        .col-8 
-                            if(role.permissions.includes("orders_edit"))
-                                +form-change-multi(`${prefixAdmin}/info-order/change-multi?_method=PATCH`)
-                        .col-4 
-                            if(role.permissions.includes("orders_create"))
-                                a(
-                                    href=`${prefixAdmin}/info-order/create`
-                                    class="btn btn-outline-success"
-                                ) + Thêm mới
+                    .small.text-muted.mt-1 Tìm theo tên, số điện thoại, địa chỉ khách hàng
+            .col-md-6
+                .bg-white.p-3.rounded.border
+                    label.form-label.fw-semibold.mb-2 Sắp xếp
+                    +sort()
 
-        .card-mb-3
-            .card-header Sắp xếp 
-                .card-body 
-                    .row
-                        .col-4 
-                            +sort()
+        // Multi Action
+        if(role.permissions.includes("orders_edit"))
+            .mb-3
+                +form-change-multi(`${prefixAdmin}/info-order/change-multi?_method=PATCH`)
 
-                    table(
-                        class="table table-hover table-sm"
-                        checkbox-multi
-                    )
-                        thead 
-                            tr 
-                                th  
-                                    input(type="checkbox" name="checkall")
-                                th STT 
-                                th Mã đơn 
-                                th Khách hàng
-                                th Số lượng
-                                th Tổng tiền
-                                th Trạng thái 
-                                th Thời gian
-                                th Hành động
+        // Orders Table
+        .bg-white.rounded-3.shadow-sm.overflow-hidden
+            .table-responsive
+                table.table.table-hover.mb-0.admin-table(checkbox-multi)
+                    thead
+                        tr
+                            th.py-4.px-4.border-0.text-center(width="60" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                .custom-control.custom-checkbox
+                                    input.custom-control-input.form-check-input(type="checkbox" name="checkall" id="checkall-orders")
+                                    label.custom-control-label(for="checkall-orders")
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="70" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-hashtag.me-1
+                                | STT
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="120" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-barcode.me-1
+                                | Mã đơn hàng
+                            th.py-4.border-0.fw-bold.text-muted(width="200" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-user.me-1
+                                | Khách hàng
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-cubes.me-1
+                                | Số lượng
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="120" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-dollar-sign.me-1
+                                | Tổng tiền
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="130" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-toggle-on.me-1
+                                | Trạng thái
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="150" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-clock.me-1
+                                | Thời gian
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="160" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-cogs.me-1
+                                | Thao tác
 
-                        tbody 
-                            each item, index in products
-                                tr 
-                                    td 
-                                        input(
+                    tbody
+                        each item, index in orders
+                            tr.table-row-hover.align-middle
+                                td.px-4.text-center
+                                    .custom-control.custom-checkbox
+                                        input.custom-control-input(
                                             type="checkbox"
                                             name="id"
-                                            value=item.id 
+                                            value=item.id
+                                            id=`checkbox-order-${item.id}`
                                         )
-                                    td #{pagination.limitItems*(pagination.currentPage - 1) + (index + 1)}
-                                    td 
-                                    td #{item.title}
-                                    td #{item.title}
-                                    td #{item.price}$
-                                    td
-                                        if(role.permissions.includes("orders_edit"))
-                                            if(item.status == "active")
-                                                a(href="javascript:;" 
-                                                data-status = item.status
-                                                data-id=item.id
-                                                button-change-status
-                                                class="badge badge-success"
-                                                ) Hoạt động 
-                                            else 
-                                                a(href="javascript:;" 
-                                                data-status = item.status
-                                                data-id=item.id
-                                                button-change-status
-                                                class="badge badge-danger"
-                                                ) Dừng hoạt động 
-                                    td 
-                                        p #{item.accountFullName}
-                                        //- if(item.createdBy.createdAt)
-                                        p 
-                                            +formatDateTime(item.createdBy.createdAt)
-                                    td 
-                                        a(
+                                        label.custom-control-label(for=`checkbox-order-${item.id}`)
+                                
+                                td.text-center.fw-bold.text-muted
+                                    | #{pagination.limitItems*(pagination.currentPage - 1) + (index + 1)}
+                                
+                                td.text-center.align-middle
+                                    .order-code
+                                        .badge.bg-primary.bg-opacity-10.text-primary.px-3.py-2.rounded-pill.fw-semibold
+                                            i.fas.fa-receipt.me-1
+                                            | ##{item._id.toString().slice(-6).toUpperCase()}
+                                
+                                td.align-middle
+                                    .customer-info
+                                        .fw-semibold.text-dark #{item.userInfo.fullName}
+                                        .small.text-muted.mt-1
+                                            i.fas.fa-phone.me-1
+                                            | #{item.userInfo.phone}
+                                        .small.text-muted
+                                            i.fas.fa-map-marker-alt.me-1
+                                            | #{item.userInfo.address.substring(0, 30)}...
+                                
+                                td.text-center.align-middle
+                                    .quantity-badge
+                                        .badge.bg-info.bg-opacity-10.text-info.px-3.py-2.rounded-pill.fw-semibold
+                                            i.fas.fa-box.me-1
+                                            | #{item.totalQuantity}
+                                
+                                td.text-center.align-middle
+                                    .total-price
+                                        .fw-bold.text-success.fs-6 #{item.totalPrice}$
+                                        .small.text-muted USD
+                                
+                                td.text-center.align-middle
+                                    span.badge.bg-success.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                                        i.fas.fa-check-circle.me-1
+                                        | Hoàn thành
+                                
+                                td.text-center.align-middle
+                                    .order-time
+                                        .small.fw-semibold.text-dark Khách hàng
+                                        .small.text-muted.mt-1
+                                            +formatDateTime(item.createdAt)
+                                
+                                td.text-center.align-middle
+                                    .btn-group.btn-group-sm(role="group")
+                                        a.btn.btn-outline-info.btn-sm.rounded-pill.me-1(
                                             href=`${prefixAdmin}/info-order/detail/${item.id}`
-                                            class="btn btn-secondary btn-sm"
-                                        ) Chi tiết
-                                        if(role.permissions.includes("orders_edit"))
-                                            a(
-                                                href=`${prefixAdmin}/info-order/edit/${item.id}`
-                                                class="btn btn-warning btn-sm"
-                                            ) Sửa
+                                            title="Xem chi tiết"
+                                        )
+                                            i.fas.fa-eye
+                                        
                                         if(role.permissions.includes("orders_delete"))
-                                            button(
-                                                class="btn btn-danger btn-sm ml-1"
+                                            button.btn.btn-outline-danger.btn-sm.rounded-pill(
                                                 button-delete
                                                 data-id=item.id
-                                            ) Xóa
-                                        
-        //- //Phân trang
-        +pagination(pagination)
+                                                title="Xóa đơn hàng"
+                                            )
+                                                i.fas.fa-trash-alt
+        // Pagination
+        .d-flex.justify-content-center.mt-4
+            +pagination(pagination)
 
-        form(
-            action=""
-            method="POST"
-            id="form-change-status"
-            data-path=`${prefixAdmin}/info-order/change-status`
-        ) 
+    // Hidden Forms
+    form#form-change-status(
+        action=""
+        method="POST"
+        data-path=`${prefixAdmin}/info-order/change-status`
+    )
 
-        form(
-            action=""
-            method="POST"
-            id="form-delete-item"
-            data-path=`${prefixAdmin}/info-order/delete`
-        ) 
+    form#form-delete-item(
+        action=""
+        method="POST"
+        data-path=`${prefixAdmin}/info-order/delete`
+    )
 
-        script(src="/admin/js/product.js") 
+    script(src="/admin/js/product.js") 

@@ -6,101 +6,151 @@ block main
     if(role.permissions.includes("posts-category_view"))
         +alert-success(5000)
 
-        h1 Danh mục bài viết
-        .card-mb-3
-            .card-header Danh sách
-                .card-body
-                    .row 
-                        .col-4 
-                            if(role.permissions.includes("posts-category_create"))
-                                a(
-                                    href=`${prefixAdmin}/posts-category/create`
-                                    class="btn btn-outline-success"
-                                ) + Thêm mới
+        // Header
+        .d-flex.justify-content-between.align-items-center.mb-4
+            h2.fw-bold.text-dark.mb-0 Danh mục bài viết
+            if(role.permissions.includes("posts-category_create"))
+                a.btn.btn-primary.px-4(href=`${prefixAdmin}/posts-category/create`)
+                    i.fas.fa-plus.me-2
+                    | Thêm mới
 
-                    table(
-                        class="table table-hover table-sm"
-                        checkbox-multi
-                    )
-                        thead 
-                            tr 
-                                th  
-                                    input(type="checkbox" name="checkall")
-                                th STT 
-                                th Tiêu đề
-                                th Danh mục
-                                th Vị trí
-                                th Trạng thái 
-                                th Hành động
+        // Posts Category Table
+        .bg-white.rounded-3.shadow-sm.overflow-hidden
+            .table-responsive
+                table.table.table-hover.mb-0.admin-table(checkbox-multi)
+                    thead
+                        tr
+                            th.py-4.px-4.border-0.text-center(width="60" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                .custom-control.custom-checkbox
+                                    input.custom-control-input.form-check-input(type="checkbox" name="checkall" id="checkall-posts-category")
+                                    label.custom-control-label(for="checkall-posts-category")
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="70" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-hashtag.me-1
+                                | STT
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-image.me-1
+                                | Hình ảnh
+                            th.py-4.border-0.fw-bold.text-muted(width="200" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-folder.me-1
+                                | Tên danh mục
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="100" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-sort-numeric-down.me-1
+                                | Vị trí
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="130" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-toggle-on.me-1
+                                | Trạng thái
+                            th.py-4.border-0.text-center.fw-bold.text-muted(width="180" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);")
+                                i.fas.fa-cogs.me-1
+                                | Thao tác
 
-                        tbody 
-                            each item, index in records
-                                //- - const prefix = Array(level + 1).join("-- ")
-                                tr 
-                                    td 
-                                        input(
+                    tbody
+                        each item, index in records
+                            tr.table-row-hover.align-middle
+                                td.px-4.text-center
+                                    .custom-control.custom-checkbox
+                                        input.custom-control-input(
                                             type="checkbox"
                                             name="id"
-                                            value=item.id 
+                                            value=item.id
+                                            id=`checkbox-posts-category-${item.id}`
                                         )
-                                    td #{item.index}
-                                    td !{item.description}
-                                    td #{prefix}#{item.title}
-                                    td 
-                                        input(
+                                        label.custom-control-label(for=`checkbox-posts-category-${item.id}`)
+                                
+                                td.text-center.fw-bold.text-muted
+                                    | #{index + 1}
+                                
+                                td.text-center.align-middle
+                                    .thumbnail-container
+                                        img.rounded.shadow-sm(
+                                            src=item.thumbnail
+                                            alt=item.title
+                                            style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #e9ecef;"
+                                            onerror="this.src='/images/150x150.svg'"
+                                        )
+                                
+                                td.align-middle
+                                    .fw-semibold.text-dark #{item.title}
+                                    .small.text-muted.mt-1 ID: #{item.id}
+                                
+                                td.text-center.align-middle
+                                    .position-input-group
+                                        input.form-control.form-control-sm.text-center(
                                             type="number"
                                             value=item.position 
-                                            style="width: 60px"
-                                            min= "1"
+                                            style="width: 70px; border-radius: 8px;"
+                                            min="1"
                                             name="position"
+                                            title="Vị trí sắp xếp"
                                         )
-                                    td
-                                        if(role.permissions.includes("posts-category_edit"))
-                                            if(item.status == "active")
-                                                a(href="javascript:;" 
-                                                data-status = item.status
+                                
+                                td.text-center.align-middle
+                                    if(role.permissions.includes("posts-category_edit"))
+                                        if(item.status == "active")
+                                            a.status-badge.badge.bg-success.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                                                href="javascript:;" 
+                                                data-status=item.status
                                                 data-id=item.id
                                                 button-change-status
-                                                class="badge badge-success"
-                                                ) Hoạt động 
-                                            else 
-                                                a(href="javascript:;" 
-                                                data-status = item.status
+                                                title="Nhấp để thay đổi trạng thái"
+                                                style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                                            )
+                                                i.fas.fa-check-circle.me-1
+                                                | Hoạt động
+                                        else
+                                            a.status-badge.badge.bg-danger.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                                                href="javascript:;" 
+                                                data-status=item.status
                                                 data-id=item.id
                                                 button-change-status
-                                                class="badge badge-danger"
-                                                ) Dừng hoạt động 
-                                    td 
-                                        a(
+                                                title="Nhấp để thay đổi trạng thái"
+                                                style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                                            )
+                                                i.fas.fa-times-circle.me-1
+                                                | Dừng hoạt động
+                                    else
+                                        if(item.status == "active")
+                                            span.badge.bg-success.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                                                i.fas.fa-check-circle.me-1
+                                                | Hoạt động
+                                        else
+                                            span.badge.bg-danger.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                                                i.fas.fa-times-circle.me-1
+                                                | Dừng hoạt động
+                                
+                                td.text-center.align-middle
+                                    .btn-group.btn-group-sm(role="group")
+                                        a.btn.btn-outline-info.btn-sm.rounded-pill.me-1(
                                             href=`${prefixAdmin}/posts-category/detail/${item.id}`
-                                            class="btn btn-secondary btn-sm"
-                                        ) Chi tiết
+                                            title="Xem chi tiết"
+                                        )
+                                            i.fas.fa-eye
+                                        
                                         if(role.permissions.includes("posts-category_edit"))
-                                            a(
+                                            a.btn.btn-outline-warning.btn-sm.rounded-pill.me-1(
                                                 href=`${prefixAdmin}/posts-category/edit/${item.id}`
-                                                class="btn btn-warning btn-sm"
-                                            ) Sửa
+                                                title="Chỉnh sửa"
+                                            )
+                                                i.fas.fa-edit
+                                        
                                         if(role.permissions.includes("posts-category_delete"))
-                                            button(
-                                                class="btn btn-danger btn-sm ml-1"
+                                            button.btn.btn-outline-danger.btn-sm.rounded-pill(
                                                 button-delete
                                                 data-id=item.id
-                                            ) Xóa
-                                //- if item.children && item.children.length > 0
-                                //-     +table-tree(item.children, level + 1)
+                                                title="Xóa danh mục"
+                                            )
+                                                i.fas.fa-trash-alt
 
-    form(
+    // Hidden Forms
+    form#form-change-status(
         action=""
         method="POST"
-        id="form-change-status"
         data-path=`${prefixAdmin}/posts-category/change-status`
-    ) 
+    )
 
-    form(
+    form#form-delete-item(
         action=""
         method="POST"
-        id="form-delete-item"
         data-path=`${prefixAdmin}/posts-category/delete`
-    ) 
+    )
 
     script(src="/admin/js/product.js") 

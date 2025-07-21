@@ -1,61 +1,105 @@
 mixin table-tree(items, level = 1)
     each item, index in items
-        - const prefix = Array(level + 1).join("-- ")
-        tr 
-            td 
-                input(
+        - const prefix = Array(level + 1).join("│   ")
+        tr(class="table-row-hover align-middle")
+            td.text-center
+                .custom-control.custom-checkbox
+                    input.custom-control-input(
                     type="checkbox"
                     name="id"
                     value=item.id 
-                )
-            td #{item.index}
-            td 
-                img(
+                        id=`checkbox-${item.id}`
+                    )
+                    label.custom-control-label(for=`checkbox-${item.id}`)
+            
+            td.text-center.fw-bold.text-muted #{item.index}
+            
+            td.text-center
+                .thumbnail-container
+                    img.rounded.shadow-sm(
                     src= item.thumbnail
                     alt= item.title
-                    width="100px"
-                    height="auto"
+                        style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #e9ecef;"
+                        onerror="this.src='/images/150x150.svg'"
                 )
-            td #{prefix}#{item.title}
-            td 
-                input(
+            
+            td.category-title
+                .d-flex.align-items-center
+                    if level > 1
+                        span.tree-prefix.text-muted.me-2(style="font-family: monospace; font-size: 14px;") #{prefix}
+                        i.fas.fa-level-up-alt.text-primary.me-1(style="transform: rotate(90deg); font-size: 12px;")
+                    .category-name
+                        strong.text-dark #{item.title}
+                        if level > 1
+                            small.text-muted.d-block Danh mục con cấp #{level}
+            
+            td.text-center
+                .position-input-group
+                    input.form-control.form-control-sm.text-center(
                     type="number"
                     value=item.position 
-                    style="width: 60px"
-                    min= "1"
+                        style="width: 70px; border-radius: 8px;"
+                        min="1"
                     name="position"
+                        title="Vị trí sắp xếp"
                 )
-            td
+            
+            td.text-center
                 if(role.permissions.includes("products-category_edit"))
                     if(item.status == "active")
-                        a(href="javascript:;" 
-                        data-status = item.status
+                        a.status-badge.badge.bg-success.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                            href="javascript:;" 
+                            data-status=item.status
                         data-id=item.id
                         button-change-status
-                        class="badge badge-success"
-                        ) Hoạt động 
+                            title="Nhấp để thay đổi trạng thái"
+                            style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                        ) 
+                            i.fas.fa-check-circle.me-1
+                            | Hoạt động
                     else 
-                        a(href="javascript:;" 
-                        data-status = item.status
+                        a.status-badge.badge.bg-danger.text-white.px-3.py-2.rounded-pill.text-decoration-none(
+                            href="javascript:;" 
+                            data-status=item.status
                         data-id=item.id
                         button-change-status
-                        class="badge badge-danger"
-                        ) Dừng hoạt động 
-            td 
-                a(
+                            title="Nhấp để thay đổi trạng thái"
+                            style="font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                        )
+                            i.fas.fa-times-circle.me-1
+                            | Dừng hoạt động
+                else
+                    if(item.status == "active")
+                        span.badge.bg-success.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                            i.fas.fa-check-circle.me-1
+                            | Hoạt động
+                    else
+                        span.badge.bg-danger.text-white.px-3.py-2.rounded-pill(style="font-size: 12px;")
+                            i.fas.fa-times-circle.me-1
+                            | Dừng hoạt động
+            
+            td.text-center
+                .btn-group.btn-group-sm(role="group")
+                    a.btn.btn-outline-info.btn-sm.rounded-pill.me-1(
                     href=`${prefixAdmin}/products-category/detail/${item.id}`
-                    class="btn btn-secondary btn-sm"
-                ) Chi tiết
+                        title="Xem chi tiết"
+                    )
+                        i.fas.fa-eye.me-1
+                    
                 if(role.permissions.includes("products-category_edit"))
-                    a(
+                        a.btn.btn-outline-warning.btn-sm.rounded-pill.me-1(
                         href=`${prefixAdmin}/products-category/edit/${item.id}`
-                        class="btn btn-warning btn-sm"
-                    ) Sửa
+                            title="Chỉnh sửa"
+                        )
+                            i.fas.fa-edit.me-1
+                    
                 if(role.permissions.includes("products-category_delete"))
-                    button(
-                        class="btn btn-danger btn-sm ml-1"
+                        button.btn.btn-outline-danger.btn-sm.rounded-pill(
                         button-delete
                         data-id=item.id
-                    ) Xóa
+                            title="Xóa danh mục"
+                        )
+                            i.fas.fa-trash-alt.me-1
+
         if item.children && item.children.length > 0
             +table-tree(item.children, level + 1)

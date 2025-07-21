@@ -1,17 +1,140 @@
-header.header 
-    .container-fluid 
-        .row.align-items-center 
-            .col-3 
-                .inner-logo 
-                    a(href="/admin/dashboard") ADMIN 
+header.admin-header.bg-white.shadow-sm.border-bottom.position-fixed.w-100(style="top: 0; z-index: 1030; height: 70px;")
+    .container-fluid.h-100
+        .d-flex.align-items-center.justify-content-between.h-100.px-3
+            // Left Section: Logo and Brand
+            .header-left.d-flex.align-items-center
+                .brand-toggle.me-3
+                    button.btn.btn-link.border-0.p-2.sidebar-toggle(type="button")
+                        i.fas.fa-bars.fs-5.text-dark
+                .brand-logo
+                    a.text-decoration-none.d-flex.align-items-center(href="/admin/dashboard")
+                        .brand-icon.bg-primary.rounded-3.p-2.me-2
+                            i.fas.fa-shield-alt.text-white.fs-5
+                        .brand-text
+                            .brand-name.fw-bold.text-dark.fs-4 ADMIN
+                            .brand-subtitle.small.text-muted.d-none.d-md-block Hệ thống quản trị
 
-            .col-9
-                div(class="text-right")
-                    a(
-                        href=`${prefixAdmin}/my-account`
-                        class="btn btn-primary btn-sm mr-2"
-                    ) #{user.fullName}
-                    a(
-                        href=`${prefixAdmin}/auth/logout`
-                        class="btn btn-danger btn-sm"
-                    ) Đăng xuất
+            // Center Section: Search (Hidden on smaller screens)
+            .header-center.flex-grow-1.mx-4.d-none.d-lg-flex.justify-content-center
+                .search-container(style="max-width: 450px; width: 100%;")
+                    .position-relative
+                        input.form-control.border-0.bg-light.rounded-pill.ps-4.pe-5(
+                            type="search"
+                            placeholder="Tìm kiếm trong admin..."
+                            style="height: 42px;"
+                        )
+                        .search-icon.position-absolute.end-0.top-50.translate-middle-y.me-3(style="z-index: 10;")
+                            i.fas.fa-search.text-muted
+
+            // Right Section: User Actions
+            .header-right.d-flex.align-items-center.gap-2
+                // Notifications
+                .notification-dropdown.dropdown
+                    button.btn.btn-light.border-0.rounded-circle.position-relative(
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style="width: 42px; height: 42px;"
+                    )
+                        i.fas.fa-bell.text-muted
+                        .notification-badge.position-absolute.top-0.start-100.translate-middle.bg-danger.rounded-circle(style="width: 8px; height: 8px;")
+                    ul.dropdown-menu.dropdown-menu-end.border-0.shadow-lg.rounded-3.p-2(style="min-width: 320px;")
+                        li.dropdown-header.d-flex.align-items-center.justify-content-between.pb-2
+                            span.fw-bold.text-dark Thông báo
+                            .badge.bg-primary.rounded-pill 3
+                        li
+                            hr.dropdown-divider.my-2
+                        li
+                            a.dropdown-item.rounded-2.p-3.mb-1(href="#")
+                                .d-flex.align-items-start
+                                    .notification-icon.me-3.flex-shrink-0
+                                        .bg-success.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 32px; height: 32px;")
+                                            i.fas.fa-shopping-cart.text-white.small
+                                    .notification-content.flex-grow-1
+                                        .notification-title.fw-semibold.small.text-dark Đơn hàng mới
+                                        .notification-text.text-muted.small Có 2 đơn hàng mới cần xử lý
+                                        .notification-time.text-muted.small.mt-1 5 phút trước
+                        li
+                            a.dropdown-item.rounded-2.p-3.mb-1(href="#")
+                                .d-flex.align-items-start
+                                    .notification-icon.me-3.flex-shrink-0
+                                        .bg-info.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 32px; height: 32px;")
+                                            i.fas.fa-user-plus.text-white.small
+                                    .notification-content.flex-grow-1
+                                        .notification-title.fw-semibold.small.text-dark Tài khoản mới
+                                        .notification-text.text-muted.small Người dùng mới đăng ký
+                                        .notification-time.text-muted.small.mt-1 1 giờ trước
+                        li.text-center.pt-2
+                            a.btn.btn-outline-primary.btn-sm.rounded-pill(href="#") Xem tất cả
+
+                // Quick Actions
+                .quick-actions.dropdown
+                    button.btn.btn-light.border-0.rounded-circle(
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style="width: 42px; height: 42px;"
+                    )
+                        i.fas.fa-plus.text-success
+                    ul.dropdown-menu.dropdown-menu-end.border-0.shadow-lg.rounded-3.p-2(style="min-width: 200px;")
+                        li.dropdown-header.fw-bold.text-dark.pb-2 Tạo mới
+                        li
+                            hr.dropdown-divider.my-2
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/products/create`)
+                                i.fas.fa-box.me-2.text-primary
+                                | Sản phẩm mới
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/posts/create`)
+                                i.fas.fa-newspaper.me-2.text-info
+                                | Bài viết mới
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/accounts/create`)
+                                i.fas.fa-user-plus.me-2.text-success
+                                | Tài khoản mới
+
+                // User Menu
+                .user-dropdown.dropdown
+                    button.admin-user-btn.btn.btn-light.border-0.rounded-pill.d-flex.align-items-center.px-3(
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style="height: 42px;"
+                    )
+                        .user-avatar.me-2
+                            .avatar.bg-primary.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 32px; height: 32px;")
+                                i.fas.fa-user.text-white.small
+                        .user-info.text-start.d-none.d-md-block
+                            .user-name.fw-semibold.text-dark.small.lh-1 #{user.fullName}
+                            .user-role.text-muted.small.lh-1 Quản trị viên
+                        i.fas.fa-chevron-down.text-muted.ms-2.small
+
+                    ul.dropdown-menu.dropdown-menu-end.border-0.shadow-lg.rounded-3.p-2(style="min-width: 220px;")
+                        li.dropdown-header.d-flex.align-items-center.pb-2
+                            .avatar.bg-primary.rounded-circle.d-flex.align-items-center.justify-content-center.me-2(style="width: 30px; height: 30px;")
+                                i.fas.fa-user.text-white.small
+                            div
+                                .fw-bold.small.text-dark #{user.fullName}
+                                .text-muted.small Quản trị viên
+                        li
+                            hr.dropdown-divider.my-2
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/my-account`)
+                                i.fas.fa-user.me-2.text-primary
+                                | Tài khoản của tôi
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/settings/general`)
+                                i.fas.fa-cog.me-2.text-secondary
+                                | Cài đặt
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3(href=`${prefixAdmin}/help`)
+                                i.fas.fa-question-circle.me-2.text-info
+                                | Trợ giúp
+                        li
+                            hr.dropdown-divider.my-2
+                        li
+                            a.dropdown-item.rounded-2.py-2.px-3.text-danger(href=`${prefixAdmin}/auth/logout`)
+                                i.fas.fa-sign-out-alt.me-2
+                                | Đăng xuất
+
+

@@ -1,31 +1,776 @@
 extends ../../layouts/default.pug
+include ../../mixins/alert.pug
 
 block main 
-    if (product.title)
-        h1(class="mb-4") #{product.title}
+    +alert-success(5000)
 
+    .posts-category-detail-container
+        // Header Section
+        .page-header
+            .header-content
+                .header-info
+                    .breadcrumb-nav.mb-2
+                        a.breadcrumb-link(href=`${prefixAdmin}/posts-category`)
+                            i.fas.fa-arrow-left.me-2
+                            span Quay lại danh sách
+                        .breadcrumb-separator /
+                        span.breadcrumb-current Chi tiết danh mục bài viết
+                    
+                    .page-title-group
+                        h1.page-title
+                            i.fas.fa-folder.me-3
+                            span #{product.title || 'Không có tên'}
+                        if(product.description)
+                            .category-badge.mt-2
+                                i.fas.fa-info-circle.me-1
+                                span #{product.description}
 
-    if (product.thumbnail)
-        div(class="mb-4") 
-            img(
-                src=product.thumbnail
-                style="width= 100px"
-            )
+                .header-actions
+                    a.btn-primary(href=`${prefixAdmin}/posts-category/edit/${product.id}`)
+                        i.fas.fa-edit.me-2
+                        span Chỉnh sửa
+                    a.btn-info(href=`${prefixAdmin}/posts/create?category=${product.id}`)
+                        i.fas.fa-plus.me-2
+                        span Thêm bài viết
 
-    p   
-        span Trạng thái: 
-        span 
-            <b>#{product.status == "active" ? "Hoạt động" : "Dừng hoạt động"}</b>
+        // Main Content
+        .detail-content
+            .content-grid
+                // Left Column - Image & Meta Information
+                .detail-sidebar
+                    // Image Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-image.me-2
+                                span Hình ảnh danh mục
+                        
+                        .card-content
+                            .image-container
+                                if (product.thumbnail)
+                                    .category-thumbnail
+                                        img.thumbnail-image(
+                                            src=product.thumbnail
+                                            alt=product.title
+                                            onerror="this.src='/images/150x150.svg'"
+                                        )
+                                        .image-overlay
+                                            .overlay-content
+                                                i.fas.fa-search-plus
+                                                span Xem lớn
+                                else
+                                    .no-image-placeholder
+                                        i.fas.fa-image.placeholder-icon
+                                        .placeholder-text Chưa có hình ảnh
+                                        .placeholder-subtext Danh mục chưa được thêm ảnh
 
-    if (product.position)
-        div(class="mb-4") Vị trí: <b>#{product.position}</b>
+                    // Meta Information Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin chi tiết
+                        
+                        .card-content
+                            .meta-grid
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-fingerprint.me-2
+                                        span ID danh mục
+                                    .meta-value.text-primary #{product.id}
 
-    if (product.description)
-        div(class="mb-4") !{product.description}
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-toggle-on.me-2
+                                        span Trạng thái
+                                    .meta-value
+                                        if(product.status == "active")
+                                            .status-badge.status-active
+                                                i.fas.fa-check-circle.me-1
+                                                span Hoạt động
+                                        else
+                                            .status-badge.status-inactive
+                                                i.fas.fa-pause-circle.me-1
+                                                span Tạm dừng
 
-    a(
-        href=`${prefixAdmin}/posts-category/edit/${product.id}`
-        class="btn btn-warning"       
-    ) Chỉnh sửa
+                                if (product.position)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-sort-numeric-down.me-2
+                                            span Vị trí sắp xếp
+                                        .meta-value #{product.position}
+
+                                if(product.createdAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-plus.me-2
+                                            span Ngày tạo
+                                        .meta-value #{new Date(product.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                                if(product.updatedAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-edit.me-2
+                                            span Cập nhật lần cuối
+                                        .meta-value #{new Date(product.updatedAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                // Right Column - Description
+                .detail-main
+                    if(product.description)
+                        .detail-card
+                            .card-header
+                                .card-title
+                                    i.fas.fa-align-left.me-2
+                                    span Mô tả danh mục
+                            
+                            .card-content
+                                .description-content
+                                    .category-description !{product.description}
+
+            // Posts in Category Section
+            if(product.posts && product.posts.length > 0)
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-newspaper.me-2
+                            span Bài viết trong danh mục
+                        .posts-count (#{product.posts.length} bài viết)
+                    
+                    .card-content
+                        .posts-grid
+                            each post in product.posts
+                                .post-item
+                                    .post-image
+                                        if(post.thumbnail)
+                                            img(src=post.thumbnail alt=post.title)
+                                        else
+                                            .no-post-image
+                                                i.fas.fa-image
+                                    .post-content
+                                        .post-title #{post.title}
+                                        .post-meta
+                                            .post-id ID: #{post.id}
+                                            if(post.createdAt)
+                                                .post-date #{new Date(post.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                        .post-status
+                                            if(post.status == "active")
+                                                .post-badge.published Xuất bản
+                                            else
+                                                .post-badge.draft Bản nháp
+                                    .post-actions
+                                        a.btn-view(href=`${prefixAdmin}/posts/detail/${post.id}`)
+                                            i.fas.fa-eye.me-1
+                                            span Xem
+
+            // Action Section
+            .action-section
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-cogs.me-2
+                            span Thao tác quản lý
+                    
+                    .card-content
+                        .action-buttons
+                            a.btn-primary(href=`${prefixAdmin}/posts-category/edit/${product.id}`)
+                                i.fas.fa-edit.me-2
+                                span Chỉnh sửa danh mục
+                            
+                            a.btn-secondary(href=`${prefixAdmin}/posts-category`)
+                                i.fas.fa-list.me-2
+                                span Danh sách danh mục
+                            
+                            a.btn-info(href=`${prefixAdmin}/posts/create?category=${product.id}`)
+                                i.fas.fa-plus.me-2
+                                span Thêm bài viết
+                            
+                            if(role.permissions && role.permissions.includes("posts-category_delete"))
+                                button.btn-danger(
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                )
+                                    i.fas.fa-trash-alt.me-2
+                                    span Xóa danh mục
+
+    // Delete Confirmation Modal
+    if(role.permissions && role.permissions.includes("posts-category_delete"))
+        .modal.fade#deleteModal(tabindex="-1")
+            .modal-dialog.modal-dialog-centered
+                .modal-content
+                    .modal-header.border-0
+                        h5.modal-title.text-danger
+                            i.fas.fa-exclamation-triangle.me-2
+                            | Xác nhận xóa danh mục
+                        button.btn-close(type="button" data-bs-dismiss="modal")
+                    .modal-body.text-center.py-4
+                        .delete-icon.mb-3
+                            i.fas.fa-trash-alt.fa-3x.text-danger.opacity-50
+                        p.mb-3.h6 Bạn có chắc chắn muốn xóa danh mục này?
+                        .alert.alert-warning.text-start
+                            strong #{product.title}
+                        p.text-muted.small Hành động này không thể hoàn tác và có thể ảnh hưởng đến các bài viết liên quan
+                    .modal-footer.border-0.justify-content-center
+                        button.btn.btn-secondary.px-4(type="button" data-bs-dismiss="modal") Hủy bỏ
+                        a.btn.btn-danger.px-4(href=`${prefixAdmin}/posts-category/delete/${product.id}`) Xóa danh mục
+
+    style.
+        .posts-category-detail-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: #6c757d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: #9b59b6;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #adb5bd;
+        }
+
+        .breadcrumb-current {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .page-title i {
+            color: #9b59b6;
+            font-size: 28px;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-info, .btn-danger {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .detail-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #9b59b6;
+        }
+
+        .posts-count {
+            background: #9b59b6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .category-thumbnail {
+            position: relative;
+            display: inline-block;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-thumbnail:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .category-thumbnail:hover .thumbnail-image {
+            transform: scale(1.05);
+        }
+
+        .overlay-content {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .overlay-content i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .no-image-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .description-content {
+            line-height: 1.8;
+        }
+
+        .category-description {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .category-description h1, .category-description h2, .category-description h3,
+        .category-description h4, .category-description h5, .category-description h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .category-description p {
+            margin-bottom: 1.5rem;
+        }
+
+        .category-description img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-description blockquote {
+            border-left: 4px solid #9b59b6;
+            padding-left: 20px;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .post-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+
+        .post-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(155, 89, 182, 0.15);
+            border-color: #9b59b6;
+        }
+
+        .post-image {
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .post-item:hover .post-image img {
+            transform: scale(1.05);
+        }
+
+        .no-post-image {
+            width: 100%;
+            height: 100%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+        }
+
+        .no-post-image i {
+            font-size: 36px;
+        }
+
+        .post-content {
+            padding: 16px;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .post-id {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .post-date {
+            font-size: 12px;
+            color: #9b59b6;
+            font-weight: 500;
+        }
+
+        .post-status {
+            margin-bottom: 12px;
+        }
+
+        .post-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .post-badge.published {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .post-badge.draft {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .action-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .delete-icon {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-sidebar {
+                order: 2;
+            }
+
+            .detail-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .posts-category-detail-container {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-actions {
+                align-self: stretch;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn-primary,
+            .header-actions .btn-info {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn-primary,
+            .action-buttons .btn-secondary,
+            .action-buttons .btn-info,
+            .action-buttons .btn-danger {
+                justify-content: center;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
     script(src="/admin/js/product.js") 

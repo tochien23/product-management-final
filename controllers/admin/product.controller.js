@@ -85,6 +85,7 @@ module.exports.index = async (req, res) => {
 
     res.render("admin/pages/products/index", {
         pageTitle: "Danh sách sản phẩm",
+        currentPage: "products",
         products: products,
         filterStatus: filterStatus,
         keyword: objectSearch.keyword,
@@ -198,6 +199,7 @@ module.exports.create = async (req, res) => {
 
     res.render("admin/pages/products/create", {
         pageTitle: "Thêm mới sản phẩm",
+        currentPage: "products",
         category: newCategory
     });
 }
@@ -243,6 +245,7 @@ module.exports.edit = async (req, res) => {
 
         res.render("admin/pages/products/edit", {
             pageTitle: "Chỉnh sửa sản phẩm",
+            currentPage: "products",
             product: product,
             category: newCategory
         });
@@ -294,6 +297,7 @@ module.exports.detail = async (req, res) => {
 
         res.render("admin/pages/products/detail", {
             pageTitle: product.title,
+            currentPage: "products",
             product: product
         });
     } catch (error) {

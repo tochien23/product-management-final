@@ -1,33 +1,330 @@
 extends ../../layouts/default.pug
 
 block main 
-    h1(class="mb-4") Thông tin cá nhân
+    .my-account-container
+        // Header Section
+        .page-header
+            .header-content
+                h1.page-title
+                    i.fas.fa-user-circle.me-3
+                    span Thông tin cá nhân
+                .header-actions
+                    a.btn-primary(href=`${prefixAdmin}/my-account/edit`)
+                        i.fas.fa-edit.me-2
+                        span Chỉnh sửa thông tin
 
-    if (user.avatar)
-        img(src=user.avatar width="150px" class="mb-3")
-    else 
-        img(src="/admin/images/avatar.png" width="150px" class="mb-3")
+        // Profile Content
+        .profile-content
+            .content-grid
+                // Avatar Section
+                .profile-sidebar
+                    .profile-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-image.me-2
+                                span Ảnh đại diện
+                        .card-content
+                            .avatar-container
+                                if (user.avatar)
+                                    img.profile-avatar(
+                                        src=user.avatar 
+                                        alt=user.fullName
+                                        onerror="this.src='/images/150x150.svg'"
+                                    )
+                                else 
+                                    .no-avatar-placeholder
+                                        i.fas.fa-user.placeholder-icon
+                                        .placeholder-text Chưa có ảnh đại diện
 
-    if (user.fullName)
-        p Họ tên: <b>#{user.fullName}</b>
+                // Information Section  
+                .profile-main
+                    .profile-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin chi tiết
+                        .card-content
+                            .info-grid
+                                .info-item
+                                    .info-label
+                                        i.fas.fa-user.me-2
+                                        span Họ và tên
+                                    .info-value
+                                        if (user.fullName)
+                                            span.user-name #{user.fullName}
+                                        else
+                                            span.no-content Chưa cập nhật
 
-    if (user.email)
-        p Email: <b>#{user.fullName}</b>
-    
-    if (user.phone)
-        p Số điện thoại: <b>#{user.phone}</b>
+                                .info-item
+                                    .info-label
+                                        i.fas.fa-envelope.me-2
+                                        span Email
+                                    .info-value
+                                        if (user.email)
+                                            a.email-link(href=`mailto:${user.email}`) #{user.email}
+                                        else
+                                            span.no-content Chưa có email
 
-    p   
-        span Trạng thái: 
-        span 
-            <b>#{user.status == "active" ? "Hoạt động" : "Dừng hoạt động"}</b>
+                                if (user.phone)
+                                    .info-item
+                                        .info-label
+                                            i.fas.fa-phone.me-2
+                                            span Số điện thoại
+                                        .info-value
+                                            a.phone-link(href=`tel:${user.phone}`) #{user.phone}
 
-    if (user.phone)
-        p Số điện thoại: <b>#{user.phone}</b>
-    
-    a(
-        href=`${prefixAdmin}/my-account/edit`
-        class="btn btn-primary"       
-    ) Chỉnh sửa thông tin
+                                .info-item
+                                    .info-label
+                                        i.fas.fa-toggle-on.me-2
+                                        span Trạng thái
+                                    .info-value
+                                        if (user.status == "active")
+                                            .status-badge.status-active
+                                                i.fas.fa-check-circle.me-1
+                                                span Hoạt động
+                                        else
+                                            .status-badge.status-inactive
+                                                i.fas.fa-ban.me-1
+                                                span Dừng hoạt động
 
-    script(src="/admin/js/product.js") 
+    style.
+        .my-account-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title i {
+            color: #3498db;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .profile-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #3498db;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .avatar-container {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 4px solid #3498db;
+        }
+
+        .no-avatar-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .email-link, .phone-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .email-link:hover, .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-content {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .profile-sidebar {
+                order: 2;
+            }
+
+            .profile-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .my-account-container {
+                padding: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+            }
+        } 

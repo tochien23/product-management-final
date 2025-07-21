@@ -28,7 +28,18 @@ app.set("view engine", "pug");
 
 //Flash
 app.use(cookieParser('keyboard cat'));
-app.use(session({ cookie: { maxAge: 60000 } }));
+
+//Session
+app.use(session({ 
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        maxAge: 60000,
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    } 
+}));
 app.use(flash());
 // End Flash
 
@@ -54,6 +65,7 @@ app.get("*", (req, res) => {
         pageTitle: "404 Not Found",
     });
 });
+
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);

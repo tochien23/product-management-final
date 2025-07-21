@@ -1,5 +1,6 @@
 // call data 
-const InfoOrder = require("../../models/info-order.model");
+const Order = require("../../models/order.model");
+const Product = require("../../models/product.model");
 const Account = require("../../models/account.model");
 
 const systemConfig = require("../../config/system");
@@ -7,281 +8,186 @@ const systemConfig = require("../../config/system");
 const filterStatusHelper = require("../../helpers/filterStatus");
 const searchHelper = require("../../helpers/search");
 const paginationHelper = require("../../helpers/pagination");
+const productHelper = require("../../helpers/products");
 
 const createTreeHelper = require("../../helpers/createTree");
 
 // [GET] / admin / info-order
 module.exports.index = async (req, res) => {
 
-    //Bộ lọc
-    const filterStatus = filterStatusHelper(req.query);
-
     let find = {
         deleted: false
     };
 
-    if (req.query.status) {
-        find.status = req.query.status;
-    }
-
-    //Tìm kiếm
+    //Tìm kiếm theo mã đơn hàng hoặc tên khách hàng
     const objectSearch = searchHelper(req.query);
     if (objectSearch.regex) {
-        find.title = objectSearch.regex;
+        find.$or = [
+            { "userInfo.fullName": objectSearch.regex },
+            { "userInfo.phone": objectSearch.regex },
+            { "userInfo.address": objectSearch.regex }
+        ];
     }
 
     //Pagination
-    const countProducts = await InfoOrder.countDocuments(find);
+    const countOrders = await Order.countDocuments(find);
     let objectPagination = paginationHelper(
         {
             currentPage: 1,
-            limitItems: 4
+            limitItems: 6
         },
         req.query,
-        countProducts
+        countOrders
     );
     //End Pagination
 
-    //Sort
+    //Sort - Mặc định sắp xếp theo ngày tạo giảm dần
     let sort = {
-
+        createdAt: "desc"
     };
     if (req.query.sortKey && req.query.sortValue) {
         sort[req.query.sortKey] = req.query.sortValue;
-    } else {
-        //Fix cứng mặc định sắp xếp thep giảm dần
-        sort.position = "desc";
     }
     //End Sort
 
     //Truy vấn Database
-    const products = await InfoOrder.find(find)
+    const orders = await Order.find(find)
         .sort(sort)
         .limit(objectPagination.limitItems)
         .skip(objectPagination.skip);
 
-    for (const product of products) {
-        // Lấy ra thông tin người tạo
-        const user = await Account.findOne({
-            _id: product.createdBy.account_id
-        });
+    // Tính toán thông tin sản phẩm và tổng tiền cho mỗi đơn hàng
+    for (const order of orders) {
+        let totalPrice = 0;
+        let totalQuantity = 0;
 
-        if (user) {
-            product.accountFullName = user.fullName;
+        for (const item of order.products) {
+            const product = await Product.findOne({
+                _id: item.product_id
+            }).select("title thumbnail slug");
+
+            if (product) {
+                item.productInfo = product;
+                item.priceNew = productHelper.priceNewProduct(item);
+                item.totalPrice = item.priceNew * item.quantity;
+                totalPrice += item.totalPrice;
+                totalQuantity += item.quantity;
+            }
         }
 
-        //Lấy ra người cạp nhật gần nhất
-        // const updatedBy = product.updatedBy[product.updatedBy.length - 1];
-        // const updatedBy = product.updatedBy.slice(-1)[0];
-        // if (updatedBy) {
-        //     const userUpdated = await Account.findOne({
-        //         _id: updatedBy.account_id
-        //     });
-
-        //     updatedBy.accountFullName = userUpdated.fullName
-        // }
+        order.totalPrice = totalPrice;
+        order.totalQuantity = totalQuantity;
     }
 
     res.render("admin/pages/info-orders/index", {
-        pageTitle: "Danh sách đơn hàng",
-        products: products,
-        filterStatus: filterStatus,
+        pageTitle: "Danh sách đơn hàng của khách hàng",
+        currentPage: "orders",
+        orders: orders,
         keyword: objectSearch.keyword,
         pagination: objectPagination
     });
 }
 
-// [PATCH] / admin / products / change-status/ :status/ :id
-module.exports.changeStatus = async (req, res) => {
-    const status = req.params.status;
+// [DELETE] / admin / orders / delete / :id
+module.exports.deleteItem = async (req, res) => {
     const id = req.params.id;
-
-    const updatedBy = {
-        account_id: res.locals.user.id,
-        updatedAt: new Date()
+    
+    try {
+        // Xóa mềm đơn hàng
+        await Order.updateOne({ _id: id }, {
+            deleted: true,
+            deletedAt: new Date()
+        });
+        
+        req.flash("success", "Đã xóa đơn hàng thành công!");
+    } catch (error) {
+        req.flash("error", "Có lỗi xảy ra khi xóa đơn hàng!");
     }
-
-    await Product.updateOne({ _id: id }, {
-        status: status,
-        $push: { updatedBy: updatedBy }
-    });
-
-    req.flash("success", "Cập nhật trạng thái thành công!");
-
+    
     res.redirect("back");
 }
 
-// [PATCH] / admin / products / change-multi
+// [PATCH] / admin / orders / change-multi
 module.exports.changeMulti = async (req, res) => {
     const type = req.body.type;
     const ids = req.body.ids.split(", ");
 
-    const updatedBy = {
-        account_id: res.locals.user.id,
-        updatedAt: new Date()
-    }
-
-    switch (type) {
-        case "active":
-            await Product.updateMany({ _id: { $in: ids } }, {
-                status: "active",
-                $push: { updatedBy: updatedBy }
-            });
-            req.flash("success", `Cập nhật trạng thái thành công ${ids.length} sản phẩm!`);
-            break;
-        case "inactive":
-            await Product.updateMany({ _id: { $in: ids } }, {
-                status: "inactive",
-                $push: { updatedBy: updatedBy }
-            });
-            req.flash("success", `Cập nhật trạng thái thành công ${ids.length} sản phẩm!`);
-            break;
-        case "delete-all":
-            await Product.updateMany(
-                { _id: { $in: ids } },
-                {
-                    deleted: true,
-                    deletedBy: {
-                        account_id: res.locals.user.id,
+    try {
+        switch (type) {
+            case "delete-all":
+                await Order.updateMany(
+                    { _id: { $in: ids } },
+                    {
+                        deleted: true,
                         deletedAt: new Date()
                     }
-                }
-            );
-            req.flash("success", `Đã xóa thành công ${ids.length} sản phẩm!`);
-            break;
-        case "change-position":
-            for (const item of ids) {
-                let [id, position] = item.split("-");
-                position = parseInt(position);
-                await Product.updateOne({ _id: id }, {
-                    position: position,
-                    $push: { updatedBy: updatedBy }
-                });
-                req.flash("success", `Đã đổi vị trí thành công ${ids.length} sản phẩm!`);
-            }
-            break;
-        default:
-            break;
+                );
+                req.flash("success", `Đã xóa thành công ${ids.length} đơn hàng!`);
+                break;
+            default:
+                req.flash("error", "Hành động không hợp lệ!");
+                break;
+        }
+    } catch (error) {
+        req.flash("error", "Có lỗi xảy ra!");
     }
 
     res.redirect("back");
 }
 
-// [DELETE] / admin / products / delete / :id
-module.exports.deleteItem = async (req, res) => {
-    const id = req.params.id;
-    // Xóa vĩnh viễn
-    // await Product.deleteOne({ _id: id });
-    // Xóa mềm 
-    await Product.updateOne({ _id: id }, {
-        deleted: true,
-        deletedBy: {
-            account_id: res.locals.user.id,
-            deletedAt: new Date()
-        }
-    });
-    req.flash("success", `Đã xóa thành công sản phẩm!`);
-    res.redirect("back");
-}
-
-// [GET] / admin / orders / create
-module.exports.create = async (req, res) => {
+// [GET] / admin / orders / search
+module.exports.search = async (req, res) => {
+    const keyword = req.query.keyword;
+    
+    if (!keyword) {
+        return res.redirect(`${systemConfig.prefixAdmin}/info-order`);
+    }
+    
     let find = {
-        deleted: false
+        deleted: false,
+        $or: [
+            { "userInfo.fullName": new RegExp(keyword, "i") },
+            { "userInfo.phone": new RegExp(keyword, "i") },
+            { "userInfo.address": new RegExp(keyword, "i") }
+        ]
     };
 
-    const category = await InfoOrder.find(find);
+    const orders = await Order.find(find)
+        .sort({ createdAt: "desc" })
+        .limit(20);
 
-    // const newCategory = createTreeHelper.tree(category);
+    // Tính toán thông tin sản phẩm cho mỗi đơn hàng
+    for (const order of orders) {
+        let totalPrice = 0;
+        let totalQuantity = 0;
 
+        for (const item of order.products) {
+            const product = await Product.findOne({
+                _id: item.product_id
+            }).select("title thumbnail slug");
 
-    res.render("admin/pages/info-orders/create", {
-        pageTitle: "Thêm mới đơn hàng",
-        category: category
+            if (product) {
+                item.productInfo = product;
+                item.priceNew = productHelper.priceNewProduct(item);
+                item.totalPrice = item.priceNew * item.quantity;
+                totalPrice += item.totalPrice;
+                totalQuantity += item.quantity;
+            }
+        }
+
+        order.totalPrice = totalPrice;
+        order.totalQuantity = totalQuantity;
+    }
+
+    res.render("admin/pages/info-orders/index", {
+        pageTitle: `Kết quả tìm kiếm: "${keyword}"`,
+        currentPage: "orders",
+        orders: orders,
+        keyword: keyword
     });
 }
 
-// [POST] / admin / products / create
-module.exports.createPost = async (req, res) => {
-    req.body.price = parseInt(req.body.price);
-    req.body.discountPercentage = parseInt(req.body.discountPercentage);
-    req.body.stock = parseInt(req.body.stock);
-
-    if (req.body.position == "") {
-        const countProducts = await Product.countDocuments();
-        req.body.position = countProducts + 1;
-    } else {
-        req.body.position = parseInt(req.body.position);
-    }
-
-    req.body.createdBy = {
-        account_id: res.locals.user.id
-    };
-
-    const product = new Product(req.body);
-    await product.save();
-
-    res.redirect(`${systemConfig.prefixAdmin}/products`);
-}
-
-// [GET] / admin / products / edit / :id
-module.exports.edit = async (req, res) => {
-    try {
-        const find = {
-            deleted: false,
-            _id: req.params.id
-        };
-
-        const product = await Product.findOne(find);
-
-        const category = await ProductCategory.find({
-            deleted: false
-        });
-
-        const newCategory = createTreeHelper.tree(category);
-
-        res.render("admin/pages/products/edit", {
-            pageTitle: "Chỉnh sửa sản phẩm",
-            product: product,
-            category: newCategory
-        });
-    } catch (error) {
-        res.redirect(`${systemConfig.prefixAdmin}/products`);
-    }
-}
-
-// [PATCH] / admin / products / edit / :id
-module.exports.editPatch = async (req, res) => {
-    const id = req.params.id;
-
-    req.body.price = parseInt(req.body.price);
-    req.body.discountPercentage = parseInt(req.body.discountPercentage);
-    req.body.stock = parseInt(req.body.stock);
-    req.body.position = parseInt(req.body.position);
-
-    if (req.file) {
-        req.body.thumbnail = `/uploads/${req.file.filename}`;
-    }
-
-    try {
-
-        const updatedBy = {
-            account_id: res.locals.user.id,
-            updatedAt: new Date()
-        }
-        await Product.updateOne({ _id: id }, {
-            ...req.body,
-            $push: { updatedBy: updatedBy }
-        });
-        req.flash("success", "Cập nhật thành công!");
-    } catch (error) {
-        req.flash("error", "Cập nhật thất bại!");
-    }
-
-    res.redirect("back");
-}
-
-// [GET] / admin / products / detail / :id
+// [GET] / admin / orders / detail / :id
 module.exports.detail = async (req, res) => {
     try {
         const find = {
@@ -289,13 +195,36 @@ module.exports.detail = async (req, res) => {
             _id: req.params.id
         };
 
-        const product = await Product.findOne(find);
+        const order = await Order.findOne(find);
 
-        res.render("admin/pages/products/detail", {
-            pageTitle: product.title,
-            product: product
+        if (!order) {
+            req.flash("error", "Không tìm thấy đơn hàng!");
+            return res.redirect(`${systemConfig.prefixAdmin}/info-order`);
+        }
+
+        // Lấy thông tin chi tiết sản phẩm
+        for (const item of order.products) {
+            const product = await Product.findOne({
+                _id: item.product_id
+            }).select("title thumbnail slug description");
+
+            if (product) {
+                item.productInfo = product;
+                item.priceNew = productHelper.priceNewProduct(item);
+                item.totalPrice = item.priceNew * item.quantity;
+            }
+        }
+
+        // Tính tổng tiền đơn hàng
+        order.totalPrice = order.products.reduce((sum, item) => sum + item.totalPrice, 0);
+
+        res.render("admin/pages/info-orders/detail", {
+            pageTitle: `Đơn hàng #${order._id.toString().slice(-6).toUpperCase()}`,
+            currentPage: "orders",
+            order: order
         });
     } catch (error) {
-        res.redirect(`${systemConfig.prefixAdmin}/products`);
+        req.flash("error", "Có lỗi xảy ra!");
+        res.redirect(`${systemConfig.prefixAdmin}/info-order`);
     }
 }

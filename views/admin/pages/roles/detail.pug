@@ -1,15 +1,526 @@
 extends ../../layouts/default.pug
+include ../../mixins/alert.pug
 
-block main 
-    if (role.title)
-        div(class="mb-4") Nhóm quyền: <b>#{role.title}</b>
+block main
+    +alert-success(5000)
 
-    if (role.description)
-        div(class="mb-4") Mô tả quyền: <b>#{role.description}</b>
-    
-    a(
-        href=`${prefixAdmin}/roles/edit/${role.id}`
-        class="btn btn-warning"       
-    ) Chỉnh sửa
+    .role-detail-container
+        // Header Section
+        .page-header
+            .header-content
+                .header-info
+                    .breadcrumb-nav.mb-2
+                        a.breadcrumb-link(href=`${prefixAdmin}/roles`)
+                            i.fas.fa-arrow-left.me-2
+                            span Quay lại danh sách
+                        .breadcrumb-separator /
+                        span.breadcrumb-current Chi tiết nhóm quyền
+                    
+                    .page-title-group
+                        h1.page-title
+                            i.fas.fa-shield-alt.me-3
+                            span #{role.title || 'Không có tên'}
+                        if(role.description)
+                            .role-badge.mt-2
+                                i.fas.fa-info-circle.me-1
+                                span #{role.description}
 
-    script(src="/admin/js/product.js") 
+                .header-actions
+                    a.btn-primary(href=`${prefixAdmin}/roles/edit/${role.id}`)
+                        i.fas.fa-edit.me-2
+                        span Chỉnh sửa
+                    a.btn-info(href=`${prefixAdmin}/roles/permissions`)
+                        i.fas.fa-key.me-2
+                        span Phân quyền
+
+        // Main Content
+        .detail-content
+            .content-grid
+                // Left Column - Role Info & Meta Information
+                .detail-sidebar
+                    // Basic Information Section
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-info-circle.me-2
+                                span Thông tin cơ bản
+                        
+                        .card-content
+                            .meta-grid
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-fingerprint.me-2
+                                        span ID nhóm quyền
+                                    .meta-value.text-primary #{role.id}
+
+                                .meta-item
+                                    .meta-label
+                                        i.fas.fa-tag.me-2
+                                        span Tên nhóm quyền
+                                    .meta-value
+                                        if (role.title)
+                                            .role-title #{role.title}
+                                        else
+                                            .no-content-text Chưa có tên
+
+                                if(role.createdAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-plus.me-2
+                                            span Ngày tạo
+                                        .meta-value #{new Date(role.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                                if(role.updatedAt)
+                                    .meta-item
+                                        .meta-label
+                                            i.fas.fa-calendar-edit.me-2
+                                            span Cập nhật lần cuối
+                                        .meta-value #{new Date(role.updatedAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+                // Right Column - Permissions
+                .detail-main
+                    .detail-card
+                        .card-header
+                            .card-title
+                                i.fas.fa-key.me-2
+                                span Quyền hạn được cấp
+                        
+                        .card-content
+                            .permissions-area
+                                if (role.permissions && role.permissions.length > 0)
+                                    .permissions-grid
+                                        each permission in role.permissions
+                                            .permission-item
+                                                i.fas.fa-check-circle.me-2
+                                                span #{permission}
+                                else
+                                    .no-permissions-placeholder
+                                        i.fas.fa-shield-alt.placeholder-icon
+                                        .placeholder-text Chưa có quyền hạn
+                                        .placeholder-subtext Nhóm quyền chưa được cấp quyền nào
+
+            // Description Section
+            if(role.description)
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-align-left.me-2
+                            span Mô tả nhóm quyền
+                    
+                    .card-content
+                        .description-content
+                            .role-description #{role.description}
+
+            // Action Section
+            .action-section
+                .detail-card
+                    .card-header
+                        .card-title
+                            i.fas.fa-cogs.me-2
+                            span Thao tác quản lý
+                    
+                    .card-content
+                        .action-buttons
+                            a.btn-primary(href=`${prefixAdmin}/roles/edit/${role.id}`)
+                                i.fas.fa-edit.me-2
+                                span Chỉnh sửa nhóm quyền
+                            
+                            a.btn-secondary(href=`${prefixAdmin}/roles`)
+                                i.fas.fa-list.me-2
+                                span Danh sách nhóm quyền
+                            
+                            a.btn-info(href=`${prefixAdmin}/roles/permissions/${role.id}`)
+                                i.fas.fa-key.me-2
+                                span Cài đặt phân quyền
+                            
+                            if(role.permissions && role.permissions.includes("roles_delete"))
+                                button.btn-danger(
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                )
+                                    i.fas.fa-trash-alt.me-2
+                                    span Xóa nhóm quyền
+
+    // Delete Confirmation Modal
+    if(role.permissions && role.permissions.includes("roles_delete"))
+        .modal.fade#deleteModal(tabindex="-1")
+            .modal-dialog.modal-dialog-centered
+                .modal-content
+                    .modal-header.border-0
+                        h5.modal-title.text-danger
+                            i.fas.fa-exclamation-triangle.me-2
+                            | Xác nhận xóa nhóm quyền
+                        button.btn-close(type="button" data-bs-dismiss="modal")
+                    .modal-body.text-center.py-4
+                        .delete-icon.mb-3
+                            i.fas.fa-trash-alt.fa-3x.text-danger.opacity-50
+                        p.mb-3.h6 Bạn có chắc chắn muốn xóa nhóm quyền này?
+                        .alert.alert-warning.text-start
+                            strong #{role.title}
+                        p.text-muted.small Hành động này không thể hoàn tác
+                    .modal-footer.border-0.justify-content-center
+                        button.btn.btn-secondary.px-4(type="button" data-bs-dismiss="modal") Hủy bỏ
+                        a.btn.btn-danger.px-4(href=`${prefixAdmin}/roles/delete/${role.id}`) Xóa nhóm quyền
+
+    style.
+        .role-detail-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: #6c757d;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #adb5bd;
+        }
+
+        .breadcrumb-current {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .page-title i {
+            color: #e74c3c;
+            font-size: 28px;
+        }
+
+        .role-badge {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary, .btn-secondary, .btn-info, .btn-success, .btn-danger {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+
+        .detail-content {
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            color: #e74c3c;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .meta-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .role-title {
+            font-weight: 600;
+            color: #e74c3c;
+            font-size: 18px;
+        }
+
+        .no-content-text {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .permissions-area {
+            line-height: 1.8;
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            font-size: 14px;
+            font-weight: 500;
+            color: #155724;
+            transition: transform 0.2s ease;
+        }
+
+        .permission-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .permission-item i {
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .no-permissions-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        .placeholder-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .description-content {
+            line-height: 1.8;
+        }
+
+        .role-description {
+            font-size: 16px;
+            color: #2c3e50;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .action-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .delete-icon {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-sidebar {
+                order: 2;
+            }
+
+            .detail-main {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .role-detail-container {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-actions {
+                align-self: stretch;
+                justify-content: stretch;
+            }
+
+            .header-actions .btn-primary,
+            .header-actions .btn-info {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn-primary,
+            .action-buttons .btn-secondary,
+            .action-buttons .btn-info,
+            .action-buttons .btn-danger {
+                justify-content: center;
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    script(src="/admin/js/product.js")

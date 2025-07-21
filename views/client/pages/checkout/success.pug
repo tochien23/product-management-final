@@ -1,67 +1,366 @@
 extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
+include ../../mixins/alert.pug
 
 block main 
-    .container.my-3 
-        .row 
-            .col-12 
-               +box-head("Đặt hàng thành công")
+    +alert-success(5000)
+    +alert-error(5000)
 
-        .row 
-            .col-12
-                div(class="alert alert-success")
-                    | Chúc mừng bạn đã đặt hàng thành công! Chúng tôi sẽ xử lý đơn hàng trong thời gian sớm nhất
-        
-        if(order)
-            .row 
-                .col-12
-                    h4(class="mb-2") Thông tin cá nhân
-                    table(class="table table-bordered")
-                        tbody 
-                            tr 
-                                td Họ tên
-                                td 
-                                    b #{order.userInfo.fullName}
-                            tr
-                                td Số điện thoại
-                                td 
-                                    b #{order.userInfo.phone}
-                            tr
-                                td Địa chỉ
-                                td 
-                                    b #{order.userInfo.address}
+    // Page Header
+    section.page-header.bg-light.py-4.mb-4
+        .container
+            .row.align-items-center
+                .col-md-8
+                    h1.page-title.fw-bold.mb-2
+                        i.fas.fa-check-circle.me-2.text-success
+                        | Đặt hàng thành công
+                    nav(aria-label="breadcrumb")
+                        ol.breadcrumb.mb-0
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/") Trang chủ
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/cart") Giỏ hàng
+                            li.breadcrumb-item
+                                a.text-decoration-none(href="/checkout") Thanh toán
+                            li.breadcrumb-item.active(aria-current="page") Hoàn thành
+                .col-md-4.text-md-end
+                    if order && order.products && order.products.length > 0
+                        span.badge.bg-success.fs-6 
+                            i.fas.fa-box.me-1
+                            | Mã đơn: ##{order._id.toString().slice(-6).toUpperCase()}
 
-            .row 
-                .col-12
-                    table(class="table table-bordered")
-                        thead 
-                            tr  
-                                th STT
-                                th Ảnh
-                                th Tên 
-                                th Giá
-                                th Số lượng
-                                th Tổng tiền
-                        tbody 
+    // Checkout Progress - Completed
+    section.checkout-progress.py-4.mb-5
+        .container
+            .progress-steps.bg-white.rounded-4.shadow.p-4.position-relative
+                // Progress Bar Background - Completed
+                .progress-bar-container.position-absolute.d-none.d-md-block(style="top: 50%; left: 10%; right: 10%; height: 3px; transform: translateY(-50%); z-index: 1;")
+                    .progress-bar-bg.bg-light.w-100.rounded-pill(style="height: 100%;")
+                    .progress-bar-fill.bg-success.rounded-pill(style="height: 100%; width: 100%; transition: width 0.3s ease;")
+                
+                .row.text-center.position-relative(style="z-index: 2;")
+                    .col-md-4.col-12.mb-3.mb-md-0
+                        .step.completed.position-relative
+                            .step-wrapper.d-flex.flex-column.align-items-center
+                                .step-number-container.position-relative.mb-3
+                                    .step-icon.bg-success.text-white.rounded-circle.mx-auto.d-flex.align-items-center.justify-content-center.shadow-sm.position-relative(style="width: 60px; height: 60px; z-index: 3;")
+                                        .step-number.position-absolute.top-0.start-0.bg-white.text-success.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold.small(style="width: 20px; height: 20px; margin-top: -8px; margin-left: -8px;") 1
+                                        i.fas.fa-shopping-cart.fa-lg
+                                    .step-check.position-absolute.bottom-0.end-0.bg-success.text-white.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 24px; height: 24px; margin-bottom: -8px; margin-right: -8px;")
+                                        i.fas.fa-check.fa-xs
+                                .step-content
+                                    .step-label.fw-bold.text-success.mb-1 Giỏ hàng
+                                    .step-description.small.text-muted Đã chọn sản phẩm
+                    
+                    .col-md-4.col-12.mb-3.mb-md-0
+                        .step.completed.position-relative
+                            .step-wrapper.d-flex.flex-column.align-items-center
+                                .step-number-container.position-relative.mb-3
+                                    .step-icon.bg-success.text-white.rounded-circle.mx-auto.d-flex.align-items-center.justify-content-center.shadow-sm.position-relative(style="width: 60px; height: 60px; z-index: 3;")
+                                        .step-number.position-absolute.top-0.start-0.bg-white.text-success.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold.small(style="width: 20px; height: 20px; margin-top: -8px; margin-left: -8px;") 2
+                                        i.fas.fa-credit-card.fa-lg
+                                    .step-check.position-absolute.bottom-0.end-0.bg-success.text-white.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 24px; height: 24px; margin-bottom: -8px; margin-right: -8px;")
+                                        i.fas.fa-check.fa-xs
+                                .step-content
+                                    .step-label.fw-bold.text-success.mb-1 Thanh toán
+                                    .step-description.small.text-muted Đã hoàn thành
+                    
+                    .col-md-4.col-12
+                        .step.completed.position-relative
+                            .step-wrapper.d-flex.flex-column.align-items-center
+                                .step-number-container.position-relative.mb-3
+                                    .step-icon.bg-success.text-white.rounded-circle.mx-auto.d-flex.align-items-center.justify-content-center.shadow-sm.position-relative(style="width: 60px; height: 60px; z-index: 3; animation: bounce 1s infinite;")
+                                        .step-number.position-absolute.top-0.start-0.bg-white.text-success.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold.small(style="width: 20px; height: 20px; margin-top: -8px; margin-left: -8px;") 3
+                                        i.fas.fa-check-circle.fa-lg
+                                    .step-check.position-absolute.bottom-0.end-0.bg-success.text-white.rounded-circle.d-flex.align-items-center.justify-content-center(style="width: 24px; height: 24px; margin-bottom: -8px; margin-right: -8px;")
+                                        i.fas.fa-check.fa-xs
+                                .step-content
+                                    .step-label.fw-bold.text-success.mb-1 Hoàn thành
+                                    .step-description.small.text-muted Đơn hàng thành công
+
+    // Success Message
+    section.success-message.py-4.mb-4
+        .container
+            .success-card.bg-white.rounded-4.shadow.p-5.text-center
+                .success-icon.mb-4
+                    i.fas.fa-check-circle.fa-5x.text-success
+                h2.fw-bold.text-success.mb-3 Đặt hàng thành công!
+                p.lead.text-muted.mb-4 Cảm ơn bạn đã tin tưởng và đặt hàng. Chúng tôi sẽ xử lý đơn hàng và giao đến bạn trong thời gian sớm nhất.
+                .alert.alert-success.d-flex.align-items-center.border-0
+                    i.fas.fa-info-circle.me-3
+                    div
+                        strong Thông báo quan trọng:
+                        | Chúng tôi sẽ liên hệ xác nhận đơn hàng qua số điện thoại trong vòng 24 giờ.
+
+    if(order)
+        // Order Details
+        section.order-details.py-4.mb-4
+            .container
+                .row
+                    // Customer Information
+                    .col-lg-4.mb-4
+                        .info-card.bg-white.rounded-3.shadow-sm.p-4.h-100
+                            h5.fw-bold.mb-4
+                                i.fas.fa-user.me-2.text-primary
+                                | Thông tin khách hàng
+                            .customer-info
+                                .info-item.mb-3
+                                    .info-label.small.text-muted.mb-1
+                                        i.fas.fa-user.me-2
+                                        | Họ và tên
+                                    .info-value.fw-semibold #{order.userInfo.fullName}
+                                .info-item.mb-3
+                                    .info-label.small.text-muted.mb-1
+                                        i.fas.fa-phone.me-2
+                                        | Số điện thoại
+                                    .info-value.fw-semibold
+                                        a.text-decoration-none(href=`tel:${order.userInfo.phone}`) #{order.userInfo.phone}
+                                .info-item.mb-3
+                                    .info-label.small.text-muted.mb-1
+                                        i.fas.fa-map-marker-alt.me-2
+                                        | Địa chỉ giao hàng
+                                    .info-value.fw-semibold #{order.userInfo.address}
+                                if order.userInfo.email
+                                    .info-item
+                                        .info-label.small.text-muted.mb-1
+                                            i.fas.fa-envelope.me-2
+                                            | Email
+                                        .info-value.fw-semibold
+                                            a.text-decoration-none(href=`mailto:${order.userInfo.email}`) #{order.userInfo.email}
+
+                    // Order Summary
+                    .col-lg-8.mb-4
+                        .order-card.bg-white.rounded-3.shadow-sm.p-4.h-100
+                            h5.fw-bold.mb-4
+                                i.fas.fa-receipt.me-2.text-primary
+                                | Chi tiết đơn hàng
+                            
+                            // Products List
+                            .products-list.mb-4
+                                if(order.products.length > 0)
+                                    each item, index in order.products
+                                        .product-item.d-flex.align-items-center.p-3.rounded-3(class=index === order.products.length - 1 ? 'bg-light' : 'border-bottom')
+                                            .product-number.me-3
+                                                .number-badge.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 30px; height: 30px; font-size: 0.8rem;") #{index+1}
+                                            .product-image.me-3
+                                                img.rounded(
+                                                    src=item.productInfo.thumbnail
+                                                    alt=item.productInfo.title
+                                                    style="width: 80px; height: 80px; object-fit: cover;"
+                                                )
+                                            .product-details.flex-grow-1
+                                                .product-name.fw-bold.mb-1 #{item.productInfo.title}
+                                                .product-price.text-muted.small Đơn giá: #{item.priceNew}$
+                                                .product-quantity.text-muted.small Số lượng: #{item.quantity}
+                                            .product-total.text-end
+                                                .total-price.fw-bold.text-primary #{item.totalPrice}$
+                                else 
+                                    .empty-products.text-center.py-4
+                                        i.fas.fa-inbox.fa-3x.text-muted.mb-3
+                                        p.text-muted Không có sản phẩm nào trong đơn hàng
+                            
+                            // Order Total
                             if(order.products.length > 0)
-                                each item, index in order.products
-                                    tr 
-                                        td #{index+1}
-                                        td 
-                                            img(
-                                                src=item.productInfo.thumbnail
-                                                alt= item.productInfo.thumbnail
-                                                width="80px"
-                                            )
-                                        td #{item.productInfo.title}
-                                        td #{item.priceNew}$
-                                        td #{item.quantity}
-                                        td #{item.totalPrice}$
-                            else 
-                                tr 
-                                    td(
-                                        colspan="7"
-                                        class="text-center"
-                                    ) Giỏ hàng trống    
-                    if(order.products.length > 0)                                 
-                        h3(class="text-right") Tổng đơn hàng: #{order.totalPrice}$      
+                                .order-total.bg-light.rounded-3.p-3
+                                    .total-breakdown
+                                        .total-row.d-flex.justify-content-between.mb-2
+                                            span Tạm tính:
+                                            span.fw-semibold #{order.totalPrice}$
+                                        .total-row.d-flex.justify-content-between.mb-2
+                                            span Phí vận chuyển:
+                                            span.text-success
+                                                i.fas.fa-gift.me-1
+                                                | Miễn phí
+                                        .total-row.d-flex.justify-content-between.mb-2
+                                            span Thuế VAT:
+                                            span Đã bao gồm
+                                        hr.my-2
+                                        .total-final.d-flex.justify-content-between.align-items-center
+                                            span.fw-bold.fs-4 Tổng đơn hàng:
+                                            span.fw-bold.text-success.fs-3 #{order.totalPrice}$
+
+        // Action Buttons
+        section.action-buttons.py-4
+            .container
+                .action-card.bg-white.rounded-3.shadow-sm.p-4.text-center
+                    h6.fw-bold.mb-4 Bạn muốn làm gì tiếp theo?
+                    .row.justify-content-center
+                        .col-md-6.col-lg-4.mb-3
+                            a.btn.btn-primary.btn-lg.w-100(href="/products")
+                                i.fas.fa-shopping-bag.me-2
+                                | Tiếp tục mua sắm
+                        .col-md-6.col-lg-4.mb-3
+                            a.btn.btn-outline-primary.btn-lg.w-100(href="/")
+                                i.fas.fa-home.me-2
+                                | Về trang chủ
+
+    // Custom CSS for success page
+    style.
+        /* Success Page Styling */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Checkout Progress */
+        .checkout-progress .step-icon {
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .checkout-progress .step.completed .step-icon {
+            border-color: rgba(25, 135, 84, 0.2);
+        }
+        
+        .checkout-progress .step-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .checkout-progress .step-check {
+            font-size: 0.7rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .checkout-progress .step-wrapper:hover .step-icon {
+            transform: scale(1.05);
+        }
+        
+        /* Progress Bar */
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #198754, #20c997);
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.3);
+        }
+
+        /* Success Message */
+        .success-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+        }
+
+        .success-icon i {
+            animation: bounce 2s infinite;
+        }
+
+        /* Product Items */
+        .product-item {
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            background-color: #f8f9fa !important;
+            transform: translateX(5px);
+        }
+
+        .number-badge {
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover .number-badge {
+            transform: scale(1.1);
+        }
+
+        /* Info Cards */
+        .info-card, .order-card, .action-card {
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover, .order-card:hover, .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+
+        .info-item {
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+            margin: 0 -8px 12px -8px;
+        }
+
+        /* Action Buttons */
+        .btn-primary, .btn-outline-primary {
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .checkout-progress .step-icon {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            
+            .checkout-progress .step-number {
+                width: 18px !important;
+                height: 18px !important;
+                margin-top: -6px !important;
+                margin-left: -6px !important;
+            }
+            
+            .checkout-progress .step-check {
+                width: 20px !important;
+                height: 20px !important;
+                margin-bottom: -6px !important;
+                margin-right: -6px !important;
+            }
+            
+            .progress-bar-container {
+                display: none !important;
+            }
+
+            .success-icon i {
+                font-size: 3rem !important;
+            }
+
+            .product-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .product-item .product-number,
+            .product-item .product-image {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .checkout-progress .step-wrapper {
+                padding: 0 10px;
+            }
+            
+            .checkout-progress .step-label {
+                font-size: 0.9rem;
+            }
+            
+            .checkout-progress .step-description {
+                font-size: 0.8rem;
+            }
+
+            .success-card {
+                padding: 3rem 2rem !important;
+            }
+
+            .product-details {
+                margin-bottom: 15px;
+            }
+        }      

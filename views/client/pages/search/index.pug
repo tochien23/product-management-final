@@ -3,15 +3,416 @@ include ../../mixins/box-head.pug
 include ../../mixins/product-layout.pug
 
 block main 
-    .container.my-3
-        .row 
-            .col-12
-                +box-head("Kết quả tìm kiếm")
+    // Breadcrumb Section
+    .bg-light.py-3.border-bottom
+        .container
+            nav(aria-label="breadcrumb")
+                ol.breadcrumb.mb-0
+                    li.breadcrumb-item
+                        a.text-decoration-none(href="/")
+                            i.fas.fa-home.me-1
+                            | Trang chủ
+                    li.breadcrumb-item
+                        a.text-decoration-none(href="/products")
+                            i.fas.fa-shopping-bag.me-1
+                            | Sản phẩm
+                    li.breadcrumb-item.active(aria-current="page")
+                        i.fas.fa-search.me-1
+                        | Kết quả tìm kiếm
 
-        if(products.length > 0)
-            +product-grid(products)
-        else 
-            h3(class="text-center") Không tìm thấy sản phẩm nào
+    // Search Header Section
+    .search-header.bg-primary.text-white.py-4.mb-4
+        .container
+            .row.align-items-center
+                .col-lg-8
+                    .search-info
+                        h1.h3.fw-bold.mb-2
+                            i.fas.fa-search.me-2
+                            | Kết quả tìm kiếm
+                            if keyword
+                                span.text-warning.ms-2 "#{keyword}"
+                        .search-meta.d-flex.align-items-center.flex-wrap.gap-3
+                            .meta-item
+                                i.fas.fa-box.me-1
+                                span #{products ? products.length : 0} sản phẩm được tìm thấy
+                            if keyword
+                                .meta-item
+                                    i.fas.fa-tag.me-1
+                                    span Từ khóa: #{keyword}
+                .col-lg-4.text-lg-end.mt-3.mt-lg-0
+                    // Search Again Form
+                    .search-again
+                        form(action="/search" method="GET" id="searchForm")
+                            .input-group
+                                input.form-control.bg-white.border-0(
+                                    type="text"
+                                    name="keyword"
+                                    id="searchInput"
+                                    placeholder="Tìm kiếm lại..."
+                                    value=keyword || ""
+                                )
+                                button.btn.btn-warning.text-dark.fw-bold(type="submit")
+                                    i.fas.fa-search
 
+    // Main Content
+    .container.mb-5
+        if products && products.length > 0
+            // Search Results
+            .search-results
+                // Results Header
+                .results-header.d-flex.justify-content-between.align-items-center.mb-4.p-3.bg-light.rounded
+                    .results-info
+                        h5.mb-0.fw-bold.text-dark
+                            | Hiển thị #{products.length} kết quả
+                            if keyword
+                                span.text-muted.ms-2 cho "#{keyword}"
+                    
+                    .results-actions.d-flex.align-items-center.gap-2
+                        // Sort Options
+                        .dropdown
+                            button.btn.btn-outline-secondary.btn-sm.dropdown-toggle(
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            )
+                                i.fas.fa-sort.me-1
+                                | Sắp xếp
+                            ul.dropdown-menu
+                                li
+                                    a.dropdown-item(href="#") Mới nhất
+                                li
+                                    a.dropdown-item(href="#") Giá thấp đến cao
+                                li
+                                    a.dropdown-item(href="#") Giá cao đến thấp
+                                li
+                                    a.dropdown-item(href="#") Tên A-Z
 
+                        // View Toggle
+                        .btn-group(role="group")
+                            button.btn.btn-outline-secondary.btn-sm.active(type="button")
+                                i.fas.fa-th-large
+                            button.btn.btn-outline-secondary.btn-sm(type="button")
+                                i.fas.fa-list
+
+                // Products Grid
+                .products-grid
+                    +product-grid(products)
+
+                // Search Suggestions
+                .search-suggestions.mt-5.p-4.bg-light.rounded
+                    h5.fw-bold.text-dark.mb-3
+                        i.fas.fa-lightbulb.me-2.text-warning
+                        | Gợi ý tìm kiếm
+                    .row
+                        .col-md-6
+                            .suggestion-category.mb-3
+                                h6.fw-bold.text-secondary.mb-2 Danh mục phổ biến
+                                .d-flex.flex-wrap.gap-2
+                                    a.badge.bg-white.text-dark.text-decoration-none.px-3.py-2(href="/products?category=electronics")
+                                        | Điện tử
+                                    a.badge.bg-white.text-dark.text-decoration-none.px-3.py-2(href="/products?category=fashion")
+                                        | Thời trang
+                                    a.badge.bg-white.text-dark.text-decoration-none.px-3.py-2(href="/products?category=home")
+                                        | Gia dụng
+                        .col-md-6
+                            .suggestion-keywords.mb-3
+                                h6.fw-bold.text-secondary.mb-2 Từ khóa liên quan
+                                .d-flex.flex-wrap.gap-2
+                                    if keyword
+                                        - var relatedKeywords = ['chất lượng cao', 'giá rẻ', 'mới nhất', 'bán chạy']
+                                        each related in relatedKeywords
+                                            a.badge.bg-primary.text-white.text-decoration-none.px-3.py-2(href=`/search?keyword=${related}`)
+                                                | #{related}
+
+        else
+            // Empty State
+            .empty-search-state.text-center.py-5
+                .row.justify-content-center
+                    .col-md-8.col-lg-6
+                        .empty-illustration.mb-4
+                            .search-icon.mx-auto.mb-3.position-relative
+                                i.fas.fa-search.fa-5x.text-muted
+                                .search-cross.position-absolute.top-0.end-0
+                                    i.fas.fa-times.fa-2x.text-danger
+                        
+                        h3.h4.text-dark.fw-bold.mb-3
+                            | Không tìm thấy kết quả
+                            if keyword
+                                span.text-primary.ms-2 cho "#{keyword}"
+                        
+                        p.text-muted.mb-4
+                            | Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp. 
+                            | Hãy thử tìm kiếm với từ khóa khác hoặc xem các gợi ý bên dưới.
+
+                        // Search Suggestions for Empty State
+                        .search-tips.mb-4
+                            h5.fw-bold.text-dark.mb-3
+                                i.fas.fa-tips.me-2.text-info
+                                | Gợi ý tìm kiếm
+                            .row.g-3
+                                .col-sm-6.col-md-3
+                                    .tip-card.text-center.p-3.bg-light.rounded.h-100
+                                        i.fas.fa-spell-check.fa-2x.text-primary.mb-2
+                                        h6.fw-bold.mb-1 Kiểm tra chính tả
+                                        .small.text-muted Đảm bảo từ khóa được viết đúng
+                                .col-sm-6.col-md-3
+                                    .tip-card.text-center.p-3.bg-light.rounded.h-100
+                                        i.fas.fa-minus.fa-2x.text-success.mb-2
+                                        h6.fw-bold.mb-1 Rút ngắn từ khóa
+                                        .small.text-muted Thử với từ khóa ngắn hơn
+                                .col-sm-6.col-md-3
+                                    .tip-card.text-center.p-3.bg-light.rounded.h-100
+                                        i.fas.fa-tags.fa-2x.text-warning.mb-2
+                                        h6.fw-bold.mb-1 Từ khóa khác
+                                        .small.text-muted Thử với từ đồng nghĩa
+                                .col-sm-6.col-md-3
+                                    .tip-card.text-center.p-3.bg-light.rounded.h-100
+                                        i.fas.fa-filter.fa-2x.text-info.mb-2
+                                        h6.fw-bold.mb-1 Bỏ bộ lọc
+                                        .small.text-muted Tìm kiếm tổng quát hơn
+
+                        // Popular Categories
+                        .popular-categories.mb-4
+                            h5.fw-bold.text-dark.mb-3
+                                i.fas.fa-fire.me-2.text-danger
+                                | Danh mục phổ biến
+                            .row.g-3
+                                .col-6.col-md-3
+                                    a.category-card.d-block.text-decoration-none.p-3.bg-white.border.rounded.text-center.h-100(href="/products?category=electronics")
+                                        i.fas.fa-laptop.fa-2x.text-primary.mb-2.d-block
+                                        .fw-medium.text-dark Điện tử
+                                .col-6.col-md-3
+                                    a.category-card.d-block.text-decoration-none.p-3.bg-white.border.rounded.text-center.h-100(href="/products?category=fashion")
+                                        i.fas.fa-tshirt.fa-2x.text-success.mb-2.d-block
+                                        .fw-medium.text-dark Thời trang
+                                .col-6.col-md-3
+                                    a.category-card.d-block.text-decoration-none.p-3.bg-white.border.rounded.text-center.h-100(href="/products?category=home")
+                                        i.fas.fa-home.fa-2x.text-warning.mb-2.d-block
+                                        .fw-medium.text-dark Gia dụng
+                                .col-6.col-md-3
+                                    a.category-card.d-block.text-decoration-none.p-3.bg-white.border.rounded.text-center.h-100(href="/products")
+                                        i.fas.fa-th.fa-2x.text-info.mb-2.d-block
+                                        .fw-medium.text-dark Tất cả
+
+                        // Action Buttons
+                        .action-buttons.d-flex.justify-content-center.gap-3.flex-wrap
+                            a.btn.btn-primary.btn-lg(href="/products")
+                                i.fas.fa-shopping-bag.me-2
+                                | Xem tất cả sản phẩm
+                            a.btn.btn-outline-primary.btn-lg(href="/")
+                                i.fas.fa-home.me-2
+                                | Về trang chủ
+
+    // Search Form Validation Script
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            
+            // Xử lý sự kiện submit form
+            searchForm.addEventListener('submit', function(e) {
+                const keyword = searchInput.value.trim();
+                
+                // Bắt sự kiện user không nhập gì
+                if (!keyword || keyword === '') {
+                    e.preventDefault(); // Ngăn submit form
+                    
+                    // Hiển thị thông báo lỗi
+                    showSearchAlert('Vui lòng nhập từ khóa tìm kiếm!', 'warning');
+                    
+                    // Focus vào input
+                    searchInput.focus();
+                    
+                    // Thêm hiệu ứng rung cho input
+                    searchInput.classList.add('shake-input');
+                    setTimeout(() => {
+                        searchInput.classList.remove('shake-input');
+                    }, 600);
+                    
+                    return false;
+                }
+                
+                // Cập nhật giá trị input đã được trim
+                searchInput.value = keyword;
+            });
+            
+            // Xử lý sự kiện keypress để submit khi nhấn Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchForm.dispatchEvent(new Event('submit'));
+                }
+            });
+            
+            // Xóa thông báo lỗi khi user bắt đầu nhập
+            searchInput.addEventListener('input', function() {
+                const existingAlert = document.querySelector('.search-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                // Xóa class shake nếu có
+                searchInput.classList.remove('shake-input');
+            });
+        });
+        
+        // Function hiển thị thông báo tìm kiếm
+        function showSearchAlert(message, type = 'info') {
+            // Xóa alert cũ nếu có
+            const existingAlert = document.querySelector('.search-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            // Tạo alert mới
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show search-alert mt-2`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Thêm alert vào sau form
+            const searchForm = document.getElementById('searchForm');
+            searchForm.parentNode.insertBefore(alertDiv, searchForm.nextSibling);
+            
+            // Tự động ẩn sau 4 giây
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentNode) {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => {
+                        if (alertDiv && alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+    // Custom Styles
+    style.
+        .search-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+        }
+        
+        .search-again .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+        }
+        
+        /* Hiệu ứng rung cho input khi validation lỗi */
+        .shake-input {
+            animation: shake 0.6s ease-in-out;
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3) !important;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Style cho alert tìm kiếm */
+        .search-alert {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .results-header {
+            transition: all 0.3s ease;
+        }
+        
+        .results-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .search-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-cross {
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tip-card {
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .category-card {
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: var(--primary-color) !important;
+        }
+        
+        .category-card:hover .fa-laptop { color: var(--primary-color) !important; }
+        .category-card:hover .fa-tshirt { color: var(--success-color) !important; }
+        .category-card:hover .fa-home { color: var(--warning-color) !important; }
+        .category-card:hover .fa-th { color: var(--info-color) !important; }
+        
+        .badge {
+            transition: all 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .search-header .row {
+                text-align: center;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .results-actions {
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
         
